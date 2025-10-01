@@ -1,0 +1,103 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { loginUser } from '@/src/lib/auth';
+import { Button } from '@/src/components/ui/button';
+import api from '@/src/lib/axios';
+import { Input } from '@/src/components/ui/input';
+import { Label } from '@/src/components/ui/label';
+import { Flower } from 'lucide-react';
+
+export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await api.post('/auth/login', { email, password });
+      const { accessToken } = res.data;
+
+      // store access token
+      loginUser(accessToken);
+
+      // redirect to dashboard
+      router.push('/dashboard');
+    } catch (err: any) {
+      setLoading(false);
+      setError(err.response?.data?.message || 'Login failed');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      <div className="container relative grid flex-col items-center justify-center sm:max-w-none lg:grid-cols-2 lg:px-0">
+        <div className="relative hidden h-full flex-col bg-mute p-10 text-white dark:border-r lg:flex">
+          <div className="absolute inset-0 bg-zinc-900" />
+          <div className="relative z-20 flex items-center gap-1 text-lg font-medium">
+            <Flower />
+            Reset 360
+          </div>
+          <div className="relative z-20 mt-auto">
+            <blockquote className="space-y-2">
+              <p className="text-lg">
+                &ldquo;Welcome to Reset 360 Admin — where powerful tools meet rapid innovation. 
+                Our admin kit empowers you to build, adapt, and scale faster than ever, turning months of development into moments of progress.&rdquo;
+              </p>
+            </blockquote>
+          </div>
+        </div>
+        <div className="lg:p-8">
+          <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+            <div className="flex flex-col space-y-2 text-center">
+              <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+              <p className="text-sm leading-none text-muted-foreground">
+                Login with your username and password
+              </p>
+            </div>
+            <form
+              onSubmit={handleSubmit}
+              className="p-6 rounded shadow-md w-80 space-y-4"
+            >
+              <div className="grid w-full max-w-sm items-center gap-3">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  type="email"
+                  id="email"
+                  placeholder="Email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="grid w-full max-w-sm items-center gap-3">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  type="password"
+                  id="password"
+                  placeholder="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="cursor-pointer w-full bg-purple-900 text-white"
+                disabled={loading}
+              >
+                Sign in
+              </Button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
