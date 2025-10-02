@@ -9,10 +9,10 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 import { cn } from "@/src/lib/utils";
-import useAppStore from '@/src/store/useAppStore';
+import { useTheme } from 'next-themes';
 
 export function ThemeModeToggle() {
-  const { theme, setTheme } = useAppStore(state => state);
+  const {theme, setTheme} = useTheme()
 
   return (
     <DropdownMenu modal={false}>

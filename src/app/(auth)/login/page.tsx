@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loginUser } from '@/src/lib/auth';
 import { Button } from '@/src/components/ui/button';
 import api from '@/src/lib/axios';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
-import { Flower } from 'lucide-react';
+import Image from 'next/image';
+import useAppStore from '@/src/store/AuthState';
+import { loginUser } from '@/src/lib/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,6 +16,9 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const setUser = useAppStore(state => state.setUser);
+  const setToken = useAppStore(state => state.setToken);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +30,14 @@ export default function LoginPage() {
       const res = await api.post('/auth/login', { email, password });
       const { accessToken } = res.data;
 
-      // store access token
+      const userRes = await api.get('/auth/me');
+      const user = userRes.data;
+
+      // store user in zustand app store
+      setUser(user);
+      setToken(accessToken);
+
+      // store in session for api
       loginUser(accessToken);
 
       // redirect to dashboard
@@ -42,14 +53,14 @@ export default function LoginPage() {
       <div className="container relative grid flex-col items-center justify-center sm:max-w-none lg:grid-cols-2 lg:px-0">
         <div className="relative hidden h-full flex-col bg-mute p-10 text-white dark:border-r lg:flex">
           <div className="absolute inset-0 bg-zinc-900" />
-          <div className="relative z-20 flex items-center gap-1 text-lg font-medium">
-            <Flower />
+          <div className="relative z-20 flex items-center gap-1 text-lg font-medium text-purple-200">
+            <Image src={'/logo/logo_32.png'} alt={'Reset360 Logo'} width={32} height={32} />
             Reset 360
           </div>
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;Welcome to Reset 360 Admin — where powerful tools meet rapid innovation. 
+                &ldquo;Welcome to Reset 360 Admin — where powerful tools meet rapid innovation.
                 Our admin kit empowers you to build, adapt, and scale faster than ever, turning months of development into moments of progress.&rdquo;
               </p>
             </blockquote>
@@ -57,7 +68,8 @@ export default function LoginPage() {
         </div>
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-            <div className="flex flex-col space-y-2 text-center">
+            <div className="flex flex-col space-y-2 text-center items-center">
+              <Image src={'/logo/logo_250.png'} alt={'Reset360 Logo'} width={100} height={100} />
               <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
               <p className="text-sm leading-none text-muted-foreground">
                 Login with your username and password

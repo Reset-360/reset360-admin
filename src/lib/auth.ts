@@ -1,9 +1,10 @@
-import { ACCESS_TOKEN } from '../constants/storage-keys'
+import { ACCESS_TOKEN } from '../constants/storage-keys';
+import useAuthStore from '../store/AuthState';
 
-// Replace this with API calls or NextAuth
 export function isAuthenticated(): boolean {
   if (typeof window === "undefined") return false
-  return !!sessionStorage.getItem(ACCESS_TOKEN)
+  const user = useAuthStore.getState().user
+  return !!user && !!sessionStorage.getItem(ACCESS_TOKEN)
 }
 
 export function loginUser(token: string) {
@@ -11,6 +12,9 @@ export function loginUser(token: string) {
 }
 
 export function logoutUser() {
+  const clearUser = useAuthStore.getState().clearUser;
+  clearUser();
+
   sessionStorage.removeItem(ACCESS_TOKEN)
   window.location.href = "/login"
 }
