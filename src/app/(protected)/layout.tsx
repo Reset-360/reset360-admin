@@ -12,7 +12,7 @@ export default function DashboardLayout({
     <ProtectedRoute>
       <SidebarProvider>
         <AppSidebar />
-        <main className="w-full pl-2 pr-4 ">
+        <main className="w-full pl-2 pr-4">
           <TopNav />
 
           <div className="py-2">{children}</div>
