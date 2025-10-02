@@ -42,6 +42,7 @@ export default function LoginPage() {
       });
 
       setUser(meRes.data);
+      router.push('/dashboard')
     } catch (err: any) {
       setError(err.response?.data?.message || 'Ooops! Something went wrong.');
     } finally {
