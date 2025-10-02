@@ -2,19 +2,19 @@ import { ACCESS_TOKEN } from '../constants/storage-keys';
 import useAuthStore from '../store/AuthState';
 
 export function isAuthenticated(): boolean {
-  if (typeof window === "undefined") return false
-  const user = useAuthStore.getState().user
-  return !!user && !!sessionStorage.getItem(ACCESS_TOKEN)
+  if (typeof window === 'undefined') return false;
+  const user = useAuthStore.getState().user;
+  return !!user && !!sessionStorage.getItem(ACCESS_TOKEN);
 }
 
 export function loginUser(token: string) {
-  sessionStorage.setItem(ACCESS_TOKEN, token)
+  sessionStorage.setItem(ACCESS_TOKEN, token);
 }
 
 export function logoutUser() {
   const clearUser = useAuthStore.getState().clearUser;
   clearUser();
 
-  sessionStorage.removeItem(ACCESS_TOKEN)
-  window.location.href = "/login"
+  sessionStorage.removeItem(ACCESS_TOKEN);
+  window.location.href = '/login';
 }

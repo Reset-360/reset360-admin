@@ -1,18 +1,18 @@
 'use client';
 
-import { Check, Moon, Sun } from "lucide-react";
-import { Button } from "@/src/components/ui/button";
+import { Check, Moon, Sun } from 'lucide-react';
+import { Button } from '@/src/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu";
-import { cn } from "@/src/lib/utils";
+} from '@/src/components/ui/dropdown-menu';
+import { cn } from '@/src/lib/utils';
 import { useTheme } from 'next-themes';
 
 export function ThemeModeToggle() {
-  const {theme, setTheme} = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <DropdownMenu modal={false}>
@@ -24,17 +24,17 @@ export function ThemeModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem onClick={() => setTheme('light')}>
           Light
-          <Check className={cn("ml-auto", theme !== "light" && "hidden")} />
+          <Check className={cn('ml-auto', theme !== 'light' && 'hidden')} />
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem onClick={() => setTheme('dark')}>
           Dark
-          <Check className={cn("ml-auto", theme !== "dark" && "hidden")} />
+          <Check className={cn('ml-auto', theme !== 'dark' && 'hidden')} />
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        <DropdownMenuItem onClick={() => setTheme('system')}>
           System
-          <Check className={cn("ml-auto", theme !== "system" && "hidden")} />
+          <Check className={cn('ml-auto', theme !== 'system' && 'hidden')} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

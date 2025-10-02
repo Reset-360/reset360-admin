@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
 import { Button } from '../ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import { LogOut } from 'lucide-react';
 import { logoutUser } from '@/src/lib/auth';
 import useAuthStore from '@/src/store/AuthState';
@@ -24,10 +24,6 @@ export default function TopNav() {
 
   const handleToggleOpen = useCallback(() => {
     setOpen((prevOpen) => !prevOpen);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setOpen(false);
   }, []);
 
   return (

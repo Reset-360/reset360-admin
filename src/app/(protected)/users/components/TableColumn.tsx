@@ -2,7 +2,12 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { User } from '@/src/types/userTypes';
-import { ArrowUpDown, BadgeCheckIcon, BadgeXIcon, MoreHorizontal } from 'lucide-react';
+import {
+  ArrowUpDown,
+  BadgeCheckIcon,
+  BadgeXIcon,
+  MoreHorizontal,
+} from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import {
   DropdownMenu,
@@ -79,24 +84,24 @@ const TableColumn: ColumnDef<User>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <>
-      {row.getValue('emailStatus') == VerifiedStatus.VERIFIED ? (
-        <Badge
-          variant="secondary"
-          className="bg-blue-500 text-white dark:bg-blue-600"
-        >
-          <BadgeCheckIcon />
-          Verified
-        </Badge>
-      ) : (
-        <Badge
-          variant="secondary"
-        >
-          <BadgeXIcon />
-          Unverified
-        </Badge>
-      )}
-    </>,
+    cell: ({ row }) => (
+      <>
+        {row.getValue('emailStatus') == VerifiedStatus.VERIFIED ? (
+          <Badge
+            variant="secondary"
+            className="bg-blue-500 text-white dark:bg-blue-600"
+          >
+            <BadgeCheckIcon />
+            Verified
+          </Badge>
+        ) : (
+          <Badge variant="secondary">
+            <BadgeXIcon />
+            Unverified
+          </Badge>
+        )}
+      </>
+    ),
   },
   {
     accessorKey: 'phoneStatus',
@@ -111,29 +116,29 @@ const TableColumn: ColumnDef<User>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <>
-      {row.getValue('phoneStatus') == VerifiedStatus.VERIFIED ? (
-        <Badge
-          variant="secondary"
-          className="bg-blue-500 text-white dark:bg-blue-600"
-        >
-          <BadgeCheckIcon />
-          Verified
-        </Badge>
-      ) : (
-        <Badge
-          variant="secondary"
-        >
-          <BadgeXIcon />
-          Unverified
-        </Badge>
-      )}
-    </>,
+    cell: ({ row }) => (
+      <>
+        {row.getValue('phoneStatus') == VerifiedStatus.VERIFIED ? (
+          <Badge
+            variant="secondary"
+            className="bg-blue-500 text-white dark:bg-blue-600"
+          >
+            <BadgeCheckIcon />
+            Verified
+          </Badge>
+        ) : (
+          <Badge variant="secondary">
+            <BadgeXIcon />
+            Unverified
+          </Badge>
+        )}
+      </>
+    ),
   },
   {
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => {
+    cell: ({}) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

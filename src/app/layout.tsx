@@ -1,25 +1,25 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
 import { ThemeProvider } from '../components/layout/theme-provider';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Reset360 Admin",
-  description: "Reset 360 Admin Dashboard",
+  title: 'Reset360 Admin',
+  description: 'Reset 360 Admin Dashboard',
   icons: {
-    icon: "/icon.png",            // works fine with PNG
-    shortcut: "/icon.png",
-  }
+    icon: '/icon.png', // works fine with PNG
+    shortcut: '/icon.png',
+  },
 };
 
 export default function RootLayout({

@@ -13,8 +13,8 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
-} from "@tanstack/react-table"
-import {  ChevronDown } from "lucide-react"
+} from '@tanstack/react-table';
+import { ChevronDown } from 'lucide-react';
 import { User } from '@/src/types/userTypes';
 import {
   Table,
@@ -23,18 +23,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/src/components/ui/table"
+} from '@/src/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu"
+} from '@/src/components/ui/dropdown-menu';
 import columns from './components/TableColumn';
 
 export default function UsersPage() {
   const [data, setData] = useState<User[]>([]);
-  
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -72,17 +72,15 @@ export default function UsersPage() {
       sorting,
       columnFilters,
     },
-  })
+  });
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
-          value={(table.getState().globalFilter as string) ?? ""}
-          onChange={(event) =>
-            table.setGlobalFilter(event.target.value)
-          }
+          value={(table.getState().globalFilter as string) ?? ''}
+          onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>
@@ -107,7 +105,7 @@ export default function UsersPage() {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -127,7 +125,7 @@ export default function UsersPage() {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -137,7 +135,7 @@ export default function UsersPage() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -164,7 +162,7 @@ export default function UsersPage() {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="space-x-2">
@@ -185,60 +183,6 @@ export default function UsersPage() {
             Next
           </Button>
         </div>
-      </div>
-    </div>
-  )
-
-  return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Users</h1>
-
-      <div className="flex gap-2 mb-4">
-        <Input
-          placeholder="Search users..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <Button onClick={() => fetchUsers()}>Search</Button>
-      </div>
-
-      <table className="w-full border rounded-s">
-        <thead>
-          <tr>
-            <th className="p-2 text-left">Ref Id</th>
-            <th className="p-2 text-left">Name</th>
-            <th className="p-2 text-left">Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users?.map((user) => (
-            <tr key={user.id} className="border-t">
-              <td className="p-2">{user.ref}</td>
-              <td className="p-2">{user.name}</td>
-              <td className="p-2">{user.email}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className="flex justify-between mt-4">
-        <Button
-          variant="outline"
-          disabled={page <= 1}
-          onClick={() => setPage((p) => p - 1)}
-        >
-          Previous
-        </Button>
-        <span>
-          Page {page} of {totalPages}
-        </span>
-        <Button
-          variant="outline"
-          disabled={page >= totalPages}
-          onClick={() => setPage((p) => p + 1)}
-        >
-          Next
-        </Button>
       </div>
     </div>
   );
