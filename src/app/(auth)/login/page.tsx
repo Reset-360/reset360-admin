@@ -15,7 +15,7 @@ import { AlertCircleIcon } from 'lucide-react';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('Something went wrong when loggin you in.');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -24,29 +24,28 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setLoading(true);
     setError('');
 
     try {
-      const res = await api.post('/auth/login', { email, password });
-      const { accessToken } = res.data;
+      // login request
+      const loginRes = await api.post('/auth/login', { email, password });
+      const { accessToken } = loginRes.data;
 
-      const userRes = await api.get('/auth/me');
-      const user = userRes.data;
-
-      // store user in zustand app store
-      setUser(user);
+      // save token
+      loginUser(accessToken);
       setToken(accessToken);
 
-      // store in session for api
-      loginUser(accessToken);
+      // fetch user info
+      const meRes = await api.get('/auth/me', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
 
-      // redirect to dashboard
-      router.push('/dashboard');
+      setUser(meRes.data);
     } catch (err: any) {
-      setLoading(false);
       setError(err.response?.data?.message || 'Ooops! Something went wrong.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,14 +109,14 @@ export default function LoginPage() {
                 />
               </div>
 
-              {error && (
+              {error ? (
                 <Alert variant="destructive">
                   <AlertCircleIcon />
                   <AlertDescription>
                     {error}
                   </AlertDescription>
                 </Alert>
-              )}
+              ) : null}
 
               <Button
                 type="submit"
