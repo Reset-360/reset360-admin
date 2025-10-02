@@ -15,12 +15,7 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from '@/src/components/ui/sidebar';
-import {
-  LayoutDashboard,
-  Users,
-  Briefcase,
-  LogOut,
-} from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/src/lib/utils';
 
@@ -34,13 +29,18 @@ export default function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <Sidebar variant='floating' collapsible="icon" >
+    <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader>
-        <SidebarMenuButton
-          className="flex items-center gap-2"
-        >
-          <Image src={'/logo/logo_32.png'} alt={'Reset360 Logo'} width={32} height={32} />
-          <span className='text-purple-900 font-bold text-lg dark:text-purple-200'>Reset 360</span>
+        <SidebarMenuButton className="flex items-center gap-2">
+          <Image
+            src={'/logo/logo_32.png'}
+            alt={'Reset360 Logo'}
+            width={32}
+            height={32}
+          />
+          <span className="text-purple-900 font-bold text-lg dark:text-purple-200">
+            Reset 360
+          </span>
         </SidebarMenuButton>
       </SidebarHeader>
 
@@ -53,10 +53,14 @@ export default function AppSidebar() {
                 const isActive = pathname.startsWith(item.href);
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive} className={cn(
-                        "flex items-center gap-2",
-                        isActive && "bg-blue-600 text-white hover:bg-blue-700"
-                      )}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      className={cn(
+                        'flex items-center gap-2',
+                        isActive && 'bg-blue-600 text-white hover:bg-blue-700'
+                      )}
+                    >
                       <Link
                         href={item.href}
                         className="flex items-center gap-2"
