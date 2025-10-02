@@ -20,8 +20,9 @@ import {
   Users,
   Briefcase,
   LogOut,
-  Flower,
 } from 'lucide-react';
+import Image from 'next/image';
+import { cn } from '@/src/lib/utils';
 
 const menuItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -38,21 +39,24 @@ export default function AppSidebar() {
         <SidebarMenuButton
           className="flex items-center gap-2"
         >
-          <Flower className="h-4 w-4" />
-          <span>Reset 360</span>
+          <Image src={'/logo/logo_32.png'} alt={'Reset360 Logo'} width={32} height={32} />
+          <span className='text-purple-900 font-bold text-lg dark:text-purple-200'>Reset 360</span>
         </SidebarMenuButton>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel></SidebarGroupLabel>
+          <SidebarGroupLabel>Actions</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => {
                 const isActive = pathname.startsWith(item.href);
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive}>
+                    <SidebarMenuButton asChild isActive={isActive} className={cn(
+                        "flex items-center gap-2",
+                        isActive && "bg-blue-600 text-white hover:bg-blue-700"
+                      )}>
                       <Link
                         href={item.href}
                         className="flex items-center gap-2"
@@ -73,7 +77,7 @@ export default function AppSidebar() {
       <SidebarFooter>
         <SidebarMenuButton
           onClick={() => logoutUser()}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 bg-violet-900 text-white"
         >
           <LogOut className="h-4 w-4" />
           <span>Logout</span>
