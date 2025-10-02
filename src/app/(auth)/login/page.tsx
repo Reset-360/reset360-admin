@@ -50,7 +50,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      <div className="container relative grid flex-col items-center justify-center sm:max-w-none lg:grid-cols-2 lg:px-0">
+      <div className="container relative grid flex-col items-center justify-center sm:max-w-none lg:grid-cols-2 lg:px-0 ">
         <div className="relative hidden h-full flex-col bg-mute p-10 text-white dark:border-r lg:flex">
           <div className="absolute inset-0 bg-zinc-900" />
           <div className="relative z-20 flex items-center gap-1 text-lg font-medium text-purple-200">
@@ -83,13 +83,10 @@ export default function LoginPage() {
                 height={100}
               />
               <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
-              <p className="text-sm leading-none text-muted-foreground">
-                Login with your username and password
-              </p>
             </div>
             <form
               onSubmit={handleSubmit}
-              className="p-6 rounded shadow-md w-80 space-y-4"
+              className="p-0 space-y-4"
             >
               <div className="grid w-full max-w-sm items-center gap-3">
                 <Label htmlFor="email">Email</Label>
@@ -117,7 +114,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="cursor-pointer w-full bg-purple-900 text-white"
+                className="cursor-pointer w-full bg-violet-900 text-white"
                 disabled={loading}
               >
                 Sign in
