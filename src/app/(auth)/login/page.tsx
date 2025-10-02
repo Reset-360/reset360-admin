@@ -9,11 +9,13 @@ import { Label } from '@/src/components/ui/label';
 import Image from 'next/image';
 import useAppStore from '@/src/store/AuthState';
 import { loginUser } from '@/src/lib/auth';
+import { Alert, AlertDescription } from '@/src/components/ui/alert';
+import { AlertCircleIcon } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState('Something went wrong when loggin you in.');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -44,7 +46,7 @@ export default function LoginPage() {
       router.push('/dashboard');
     } catch (err: any) {
       setLoading(false);
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Ooops! Something went wrong.');
     }
   };
 
@@ -108,9 +110,14 @@ export default function LoginPage() {
                 />
               </div>
 
-              <div className="grid w-full max-w-sm items-center gap-3">
-                {error}
-              </div>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircleIcon />
+                  <AlertDescription>
+                    {error}
+                  </AlertDescription>
+                </Alert>
+              )}
 
               <Button
                 type="submit"
