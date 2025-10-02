@@ -65,7 +65,7 @@ export default function LoginPage() {
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;Welcome to Reset 360 Admin, where powerful tools meet
+                &ldquo;Welcome to Reset 360 Admin — where powerful tools meet
                 rapid innovation. Our admin kit empowers you to build, adapt,
                 and scale faster than ever, turning months of development into
                 moments of progress.&rdquo;
