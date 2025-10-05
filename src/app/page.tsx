@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { isAuthenticated } from '@/src/lib/auth';
+import LoadingSpinner from '../components/layout/loader-spinner';
 
 export default function HomePage() {
   const router = useRouter();
@@ -15,5 +16,9 @@ export default function HomePage() {
     }
   }, [router]);
 
-  return <p className="text-center mt-10">Redirecting...</p>;
+  return (
+      <div className="flex items-center justify-center h-screen">
+        <LoadingSpinner />
+      </div>
+    ) 
 }

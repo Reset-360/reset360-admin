@@ -76,7 +76,6 @@ export default function UsersPage() {
 
   return (
     <div className="w-full">
-      <h1 className="text-xl font-bold">Users</h1>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SidebarTrigger } from '../ui/sidebar';
 import { ThemeModeToggle } from './theme-mode-toggle';
 import {
@@ -14,13 +14,23 @@ import {
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { LogOut } from 'lucide-react';
-import { logoutUser } from '@/src/lib/auth';
 import useAuthStore from '@/src/store/AuthState';
+import useLogout from '@/src/hooks/useLogout';
+import { usePathname } from 'next/navigation';
+import { menuItems } from '@/src/constants/menu';
 
 export default function TopNav() {
   const identity = useAuthStore((state) => state.user);
+  const logout = useLogout()
+  const pathname = usePathname();
 
   const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState('');
+
+  useEffect(() => {
+    const menu = menuItems.find(menu => pathname.startsWith(menu.href));
+    setTitle(menu?.label ?? '')
+  }, [pathname])
 
   const handleToggleOpen = useCallback(() => {
     setOpen((prevOpen) => !prevOpen);
@@ -28,7 +38,10 @@ export default function TopNav() {
 
   return (
     <header className="h-16 border-b flex items-center px-4 justify-between">
-      <SidebarTrigger />
+      <div className="flex items-center">
+        <SidebarTrigger />
+        <h1 className="text-xl font-bold">{title}</h1>
+      </div>
 
       <div className="flex items-center gap-1">
         <ThemeModeToggle />
@@ -41,7 +54,7 @@ export default function TopNav() {
             >
               <Avatar className="h-8 w-8">
                 {/* <AvatarImage src={identity?.avatar} role="presentation" /> */}
-                <AvatarFallback>{identity?.name?.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{identity?.username?.charAt(0)}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
@@ -49,7 +62,7 @@ export default function TopNav() {
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">
-                  {identity?.name}
+                  {identity?.username}
                 </p>
               </div>
             </DropdownMenuLabel>
@@ -57,7 +70,7 @@ export default function TopNav() {
             <DropdownMenuSeparator />
 
             <DropdownMenuItem
-              onClick={() => logoutUser()}
+              onClick={logout}
               className="cursor-pointer"
             >
               <LogOut />
