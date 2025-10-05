@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { logoutUser } from '@/src/lib/auth';
 import {
   Sidebar,
   SidebarContent,
@@ -15,18 +14,15 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from '@/src/components/ui/sidebar';
-import { LayoutDashboard, Users, Briefcase, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/src/lib/utils';
-
-const menuItems = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Users', href: '/users', icon: Users },
-  { label: 'Clients', href: '/clients', icon: Briefcase },
-];
+import useLogout from '@/src/hooks/useLogout';
+import { menuItems } from '@/src/constants/menu';
 
 export default function AppSidebar() {
   const pathname = usePathname();
+  const logout = useLogout()
 
   return (
     <Sidebar variant="floating" collapsible="icon">
@@ -80,7 +76,7 @@ export default function AppSidebar() {
 
       <SidebarFooter>
         <SidebarMenuButton
-          onClick={() => logoutUser()}
+          onClick={logout}
           className="flex items-center gap-2 bg-violet-900 text-white"
         >
           <LogOut className="h-4 w-4" />

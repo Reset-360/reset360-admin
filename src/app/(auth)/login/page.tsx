@@ -8,12 +8,14 @@ import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
 import Image from 'next/image';
 import useAppStore from '@/src/store/AuthState';
-import { loginUser } from '@/src/lib/auth';
+import { loginUser, setUserRole } from '@/src/lib/auth';
 import { Alert, AlertDescription } from '@/src/components/ui/alert';
 import { AlertCircleIcon } from 'lucide-react';
+import { Role } from '@/src/types/statusTypes';
+import { getErrorMessage } from '@/src/lib/utils';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,7 +31,7 @@ export default function LoginPage() {
 
     try {
       // login request
-      const loginRes = await api.post('/auth/login', { email, password });
+      const loginRes = await api.post('/auth/login', { username, password });
       const { accessToken } = loginRes.data;
 
       // save token
@@ -41,10 +43,18 @@ export default function LoginPage() {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
 
+      const role = meRes.data.role
+      if (role !== Role.ADMIN) {
+        throw { message: 'Access Denied: This page is restricted to administrators only' }
+      }
+
       setUser(meRes.data);
+      setUserRole(role);
+      
       router.push('/dashboard')
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Ooops! Something went wrong.');
+      console.log(err)
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -91,12 +101,12 @@ export default function LoginPage() {
               className="p-0 space-y-4"
             >
               <div className="grid w-full max-w-sm items-center gap-3">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  type="email"
-                  id="email"
-                  placeholder="Email"
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="text"
+                  id="username"
+                  placeholder="Username"
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
 

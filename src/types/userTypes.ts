@@ -1,9 +1,9 @@
 import { Role, VerifiedStatus } from './statusTypes';
 
 export type User = {
-  id: string;
+  _id: string;
   ref?: string;
-  name: string;
+  username: string;
   email?: string;
   phone?: string;
   password?: string;
