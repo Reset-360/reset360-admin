@@ -29,26 +29,29 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
-import columns from './components/TableColumn'
-import { ClientProfile } from '@/src/types/clientTypes';
+import columns from './components/TableColumn';
+import { SeatCode } from '@/src/types/seatCodeTypes';
+import ViewSeatCodeDialog from './components/ViewSeatCodeDialog';
 
-export default function ClientPage() {
-  const [data, setData] = useState<ClientProfile[]>([]);
+export default function SeatCodePage() {
+  const [data, setData] = useState<SeatCode[]>([]);
+  const [currentData, setCurrentData] = useState<SeatCode>();
+
+  const [openViewDialog, setOpenViewDialog] = useState(false);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
 
-  async function fetchClients() {
+  async function fetchSeatCodes() {
     try {
       const response = await api.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/client/profiles`
+        `${process.env.NEXT_PUBLIC_API_URL}/seat-codes`
       );
 
       const data = response.data;
-      console.log(data);
-
+console.log(data)
       setData(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -56,8 +59,19 @@ export default function ClientPage() {
   }
 
   useEffect(() => {
-    fetchClients();
+    fetchSeatCodes();
   }, []);
+
+  const getDataById = (id: string) => data.find((d) => d._id === id);
+
+  const handleView = (id: string) => {
+    const data = getDataById(id);
+
+    if (data) {
+      setCurrentData(data);
+      setOpenViewDialog(true);
+    }
+  };
 
   const table = useReactTable({
     data,
@@ -72,13 +86,16 @@ export default function ClientPage() {
       sorting,
       columnFilters,
     },
+    meta: {
+      viewItem: handleView,
+    },
   });
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filter..."
           value={(table.getState().globalFilter as string) ?? ''}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="max-w-sm"
@@ -184,6 +201,12 @@ export default function ClientPage() {
           </Button>
         </div>
       </div>
+
+      <ViewSeatCodeDialog
+        open={openViewDialog}
+        onOpenChange={setOpenViewDialog}
+        seatCode={currentData}
+      />
     </div>
   );
 }

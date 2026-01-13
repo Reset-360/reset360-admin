@@ -37,9 +37,12 @@ export default function TopNav() {
   }, []);
 
   return (
-    <header className="h-16 border-b flex items-center px-4 justify-between">
-      <div className="flex items-center">
+    <header className="h-16 border-b flex items-center px-4 justify-between relative">
+      <div className="absolute" style={{ left: '-16px' }}>
         <SidebarTrigger />
+      </div>
+
+      <div className="flex items-center">
         <h1 className="text-xl font-bold">{title}</h1>
       </div>
 

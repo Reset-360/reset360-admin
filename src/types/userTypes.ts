@@ -2,7 +2,7 @@ import { Role, VerifiedStatus } from './statusTypes';
 
 export type User = {
   _id: string;
-  ref?: string;
+  ref: string;
   username: string;
   email?: string;
   phone?: string;

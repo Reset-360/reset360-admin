@@ -34,7 +34,7 @@ export default function AppSidebar() {
             width={32}
             height={32}
           />
-          <span className="text-purple-900 font-bold text-lg dark:text-purple-200">
+          <span className="text-violet-600 font-bold text-lg dark:text-violet-200">
             Reset 360
           </span>
         </SidebarMenuButton>
@@ -77,7 +77,7 @@ export default function AppSidebar() {
       <SidebarFooter>
         <SidebarMenuButton
           onClick={logout}
-          className="flex items-center gap-2 bg-violet-900 text-white"
+          className="flex items-center gap-2 bg-violet-600 text-white"
         >
           <LogOut className="h-4 w-4" />
           <span>Logout</span>

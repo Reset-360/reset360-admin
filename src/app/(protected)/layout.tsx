@@ -3,6 +3,7 @@ import TopNav from '@/src/components/layout/topnav';
 import { SidebarProvider } from '@/src/components/ui/sidebar';
 import ProtectedRoute from '@/src/lib/protected-route';
 
+
 export default function DashboardLayout({
   children,
 }: {
@@ -10,7 +11,7 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedRoute>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={false}>
         <AppSidebar />
         <main className="w-full pl-2 pr-4">
           <TopNav />
