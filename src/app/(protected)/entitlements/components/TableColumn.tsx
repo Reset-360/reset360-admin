@@ -1,13 +1,8 @@
 'use client';
+
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { User } from '@/src/types/userTypes';
-import {
-  ArrowUpDown,
-  BadgeCheckIcon,
-  BadgeXIcon,
-  MoreHorizontal,
-} from 'lucide-react';
+import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import {
   DropdownMenu,
@@ -17,123 +12,89 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
-import { VerifiedStatus } from '@/src/types/statusTypes';
+import { Assessment, ERiskBand } from '@/src/types/assessmentTypes';
 import { Badge } from '@/src/components/ui/badge';
+import { AdaptsTypeBadge } from '@/src/components/common/adapts/AdaptsTypeBadge';
+import { AssessmentStatusLabel } from '@/src/components/common/adapts/AssessmentStatusLabel';
+import { RiskBandBadge } from '@/src/components/common/clients/RiskBandBadge';
+import RefItemIdLabel from '@/src/components/common/RefItemIdLabel';
+import { EEntitlementSource, EEntitlementStatus, Entitlement } from '@/src/types/entitlementTypes';
+import { EntitlementStatusLabel } from '@/src/components/common/adapts/EntitlementStatusLabel';
+import { EntitlementSourceLabel } from '@/src/components/common/adapts/EntitlementSourceLabel';
 
-const TableColumn: ColumnDef<User>[] = [
+const TableColumn: ColumnDef<Entitlement>[] = [
   {
     accessorKey: 'ref',
     header: 'Reference ID',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('ref')}</div>,
+    cell: ({ row }) => <RefItemIdLabel ref={row.getValue('ref')} />,
   },
   {
-    accessorKey: 'username',
+      accessorKey: 'userId',
+      accessorFn: (row) => `${row.clientProfile?.firstName} ${row.clientProfile?.lastName}`, // ✅ extract nested value
+      id: 'userId',
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Client Name
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue('userId')}</div>
+      ),
+    },
+  {
+    accessorKey: 'status',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Username
+          Status
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div>{row.getValue('username')}</div>,
+    cell: ({ row }) => {
+      const status = row.getValue('status') as EEntitlementStatus;
+      return <EntitlementStatusLabel status={status} />;
+    },
   },
   {
-    accessorKey: 'email',
+    accessorKey: 'source',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Email
+          Source
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
+    cell: ({ row }) => {
+      const source = row.getValue('source') as EEntitlementSource;
+      return <EntitlementSourceLabel source={source} />;
+    },
   },
   {
-    accessorKey: 'phone',
+    accessorKey: 'type',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Phone
+          Type
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue('phone')}</div>,
-  },
-  {
-    accessorKey: 'emailStatus',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Email Verified?
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <>
-        {row.getValue('emailStatus') == VerifiedStatus.VERIFIED ? (
-          <Badge
-            variant="secondary"
-            className="bg-blue-500 text-white dark:bg-blue-600"
-          >
-            <BadgeCheckIcon />
-            Verified
-          </Badge>
-        ) : (
-          <Badge variant="secondary">
-            <BadgeXIcon />
-            Unverified
-          </Badge>
-        )}
-      </>
-    ),
-  },
-  {
-    accessorKey: 'phoneStatus',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Phone Verified?
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <>
-        {row.getValue('phoneStatus') == VerifiedStatus.VERIFIED ? (
-          <Badge
-            variant="secondary"
-            className="bg-blue-500 text-white dark:bg-blue-600"
-          >
-            <BadgeCheckIcon />
-            Verified
-          </Badge>
-        ) : (
-          <Badge variant="secondary">
-            <BadgeXIcon />
-            Unverified
-          </Badge>
-        )}
-      </>
-    ),
+    cell: ({ row }) => <AdaptsTypeBadge type={row.getValue('type')} />,
   },
   {
     id: 'actions',

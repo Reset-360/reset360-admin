@@ -29,35 +29,49 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
-import columns from './components/TableColumn'
-import { ClientProfile } from '@/src/types/clientTypes';
+import columns from './components/TableColumn';
+import ViewAssessmentDialog from './components/ViewEntitlementDialog';
+import { Entitlement } from '@/src/types/entitlementTypes';
 
-export default function ClientPage() {
-  const [data, setData] = useState<ClientProfile[]>([]);
+export default function EntitlementPage() {
+  const [data, setData] = useState<Entitlement[]>([]);
+  const [currentData, setCurrentData] = useState<Entitlement>();
+
+  const [openViewDialog, setOpenViewDialog] = useState(false);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
 
-  async function fetchClients() {
+  async function fetchEntitlements() {
     try {
       const response = await api.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/client/profiles`
+        `${process.env.NEXT_PUBLIC_API_URL}/entitlements`
       );
 
       const data = response.data;
-      console.log(data);
 
       setData(data);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching entitlements:', error);
     }
   }
 
   useEffect(() => {
-    fetchClients();
+    fetchEntitlements();
   }, []);
+
+  const getDataById = (id: string) => data.find((d) => d._id === id);
+
+  const handleView = (id: string) => {
+    const data = getDataById(id);
+
+    if (data) {
+      setCurrentData(data);
+      setOpenViewDialog(true);
+    }
+  };
 
   const table = useReactTable({
     data,
@@ -72,13 +86,16 @@ export default function ClientPage() {
       sorting,
       columnFilters,
     },
+    meta: {
+      viewItem: handleView,
+    },
   });
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filter..."
           value={(table.getState().globalFilter as string) ?? ''}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="max-w-sm"
@@ -184,6 +201,12 @@ export default function ClientPage() {
           </Button>
         </div>
       </div>
+
+      <ViewAssessmentDialog
+        open={openViewDialog}
+        onOpenChange={setOpenViewDialog}
+        entitlement={currentData}
+      />
     </div>
   );
 }

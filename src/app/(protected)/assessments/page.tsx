@@ -29,25 +29,28 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
-import columns from './components/TableColumn'
-import { ClientProfile } from '@/src/types/clientTypes';
+import columns from './components/TableColumn';
+import { Assessment } from '@/src/types/assessmentTypes';
+import ViewAssessmentDialog from './components/ViewAssessmentDialog';
 
-export default function ClientPage() {
-  const [data, setData] = useState<ClientProfile[]>([]);
+export default function AssessmentPage() {
+  const [data, setData] = useState<Assessment[]>([]);
+  const [currentData, setCurrentData] = useState<Assessment>();
+
+  const [openViewDialog, setOpenViewDialog] = useState(false);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
 
-  async function fetchClients() {
+  async function fetchAssessments() {
     try {
       const response = await api.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/client/profiles`
+        `${process.env.NEXT_PUBLIC_API_URL}/assessments`
       );
 
       const data = response.data;
-      console.log(data);
 
       setData(data);
     } catch (error) {
@@ -56,8 +59,19 @@ export default function ClientPage() {
   }
 
   useEffect(() => {
-    fetchClients();
+    fetchAssessments();
   }, []);
+
+  const getDataById = (id: string) => data.find((d) => d._id === id);
+
+  const handleView = (id: string) => {
+    const data = getDataById(id);
+
+    if (data) {
+      setCurrentData(data);
+      setOpenViewDialog(true);
+    }
+  };
 
   const table = useReactTable({
     data,
@@ -72,13 +86,16 @@ export default function ClientPage() {
       sorting,
       columnFilters,
     },
+    meta: {
+      viewItem: handleView,
+    },
   });
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filter..."
           value={(table.getState().globalFilter as string) ?? ''}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="max-w-sm"
@@ -184,6 +201,12 @@ export default function ClientPage() {
           </Button>
         </div>
       </div>
+
+      <ViewAssessmentDialog
+        open={openViewDialog}
+        onOpenChange={setOpenViewDialog}
+        assessment={currentData}
+      />
     </div>
   );
 }
