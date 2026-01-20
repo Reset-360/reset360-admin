@@ -39,6 +39,31 @@ import EditSeatBatchDialog from './components/EditSeatBatchDialog';
 import ViewSeatBatchDialog from './components/ViewSeatBatchDialog';
 import DeleteDialog from '@/src/components/common/DeleteDialog';
 import GenerateSeatCodeDialog from './components/GenerateSeatCodeDialog';
+import { PageHeader } from '@/src/components/layout/page-header';
+import { Main } from '@/src/components/layout/main';
+import { ExportDropdown } from '@/src/components/common/ExportDropdown';
+import moment from 'moment';
+
+const exportColumns = [
+  {
+    header: 'Reference ID',
+    accessorKey: 'ref',
+    accessorFn: (r: any) => r.ref,
+  },
+  {
+    header: 'Organization',
+    accessorKey: 'organizationId',
+    accessorFn: (r: any) => r.organizationId?.name,
+  },
+  {
+    header: 'Cohort',
+    accessorKey: 'cohortId',
+    accessorFn: (r: any) => r.cohortId?.name,
+  },
+  { header: 'Total Seats', accessorKey: 'totalSeats' },
+  { header: 'Seats Issued', accessorKey: 'seatsIssued' },
+  { header: 'Seats Redeemed', accessorKey: 'seatsRedeemed' },
+] as any;
 
 export default function SeatBatchPage() {
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
@@ -177,7 +202,28 @@ export default function SeatBatchPage() {
   });
 
   return (
-    <div className="w-full">
+    <Main>
+      <PageHeader
+        title="Seat Batches"
+        subtitle="Manage seat batches with full visibility into usage."
+        actions={
+          <div className="flex gap-2 items-center">
+            {/* Add Dialog Button + Prompt */}
+            <AddSeatBatchDialog
+              cohorts={cohorts}
+              organizations={organizations}
+              onSuccess={fetchSeatBatches}
+            />
+
+            <ExportDropdown
+              data={data}
+              columns={exportColumns}
+              fileName={`SeatBatches_${moment().format('MMDD')}`}
+            />
+          </div>
+        }
+      />
+
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter..."
@@ -186,13 +232,6 @@ export default function SeatBatchPage() {
           className="max-w-sm"
         />
         <div className="flex items-center gap-2">
-          {/* Add Dialog Button + Prompt */}
-          <AddSeatBatchDialog
-            cohorts={cohorts}
-            organizations={organizations}
-            onSuccess={fetchSeatBatches}
-          />
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
@@ -322,6 +361,6 @@ export default function SeatBatchPage() {
         seatBatch={currentData}
         onSuccess={refreshState}
       />
-    </div>
+    </Main>
   );
 }

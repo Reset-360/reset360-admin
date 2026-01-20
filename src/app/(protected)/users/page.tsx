@@ -31,6 +31,8 @@ import {
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
 import columns from './components/TableColumn';
+import { Main } from '@/src/components/layout/main';
+import { PageHeader } from '@/src/components/layout/page-header';
 
 export default function UsersPage() {
   const [data, setData] = useState<User[]>([]);
@@ -75,7 +77,9 @@ export default function UsersPage() {
   });
 
   return (
-    <div className="w-full">
+    <Main>
+      <PageHeader title='Users' subtitle='Directory of all users in the system.' />
+
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
@@ -184,6 +188,6 @@ export default function UsersPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </Main>
   );
 }

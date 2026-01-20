@@ -31,6 +31,8 @@ import {
 } from '@/src/components/ui/dropdown-menu';
 import columns from './components/TableColumn'
 import { ClientProfile } from '@/src/types/clientTypes';
+import { Main } from '@/src/components/layout/main';
+import { PageHeader } from '@/src/components/layout/page-header';
 
 export default function ClientPage() {
   const [data, setData] = useState<ClientProfile[]>([]);
@@ -75,7 +77,9 @@ export default function ClientPage() {
   });
 
   return (
-    <div className="w-full">
+    <Main>
+      <PageHeader title='Clients' subtitle='Browse, search, and manage client accounts.' />
+
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
@@ -184,6 +188,6 @@ export default function ClientPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </Main>
   );
 }

@@ -32,6 +32,31 @@ import {
 import columns from './components/TableColumn';
 import { SeatCode } from '@/src/types/seatCodeTypes';
 import ViewSeatCodeDialog from './components/ViewSeatCodeDialog';
+import { PageHeader } from '@/src/components/layout/page-header';
+import { Main } from '@/src/components/layout/main';
+import moment from 'moment';
+import { ExportDropdown } from '@/src/components/common/ExportDropdown';
+
+const exportColumns = [
+  {
+    header: 'Batch ID',
+    accessorKey: 'batchId',
+    accessorFn: (r: any) => r.batchId?.ref,
+  },
+  {
+    header: 'Organization',
+    accessorKey: 'organizationId',
+    accessorFn: (r: any) => r.batchId?.organizationId?.name,
+  },
+  {
+    header: 'Cohort',
+    accessorKey: 'cohortId',
+    accessorFn: (r: any) => r.cohortId?.name,
+  },
+  { header: 'Code', accessorKey: 'code' },
+  { header: 'Type', accessorKey: 'type' },
+  { header: 'Status', accessorKey: 'status' },
+] as any;
 
 export default function SeatCodePage() {
   const [data, setData] = useState<SeatCode[]>([]);
@@ -51,7 +76,6 @@ export default function SeatCodePage() {
       );
 
       const data = response.data;
-console.log(data)
       setData(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -92,40 +116,56 @@ console.log(data)
   });
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
+    <Main>
+      <PageHeader
+        title="Seat Codes"
+        subtitle="Manage and track seat codes by type and status."
+        actions={
+          <div className="flex gap-2 items-center">
+            <ExportDropdown
+              data={data}
+              columns={exportColumns}
+              fileName={`SeatCodes_${moment().format('MMDD')}`}
+            />
+          </div>
+        }
+      />
+
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter..."
           value={(table.getState().globalFilter as string) ?? ''}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="overflow-hidden rounded-md border">
         <Table>
@@ -207,6 +247,6 @@ console.log(data)
         onOpenChange={setOpenViewDialog}
         seatCode={currentData}
       />
-    </div>
+    </Main>
   );
 }

@@ -36,6 +36,26 @@ import { toast } from 'sonner';
 import DeleteDialog from '@/src/components/common/DeleteDialog';
 import ViewOrganizationDialog from './components/ViewOrganizationDialog';
 import EditOrganizationDialog from './components/EditOrganizationDialog';
+import { Main } from '@/src/components/layout/main';
+import { PageHeader } from '@/src/components/layout/page-header';
+import { ExportDropdown } from '@/src/components/common/ExportDropdown';
+import moment from 'moment';
+
+const exportColumns = [
+  {
+    header: 'Reference ID',
+    accessorKey: 'ref',
+    accessorFn: (r: any) => r.ref,
+  },
+  { header: 'Name', accessorKey: 'name' },
+  { header: 'Phone', accessorKey: 'phone' },
+  { header: 'Email', accessorKey: 'email' },
+  {
+    header: 'Status',
+    accessorKey: 'isActive',
+    accessorFn: (r: any) => (r.isActive ? 'Active' : 'Inactive'),
+  },
+] as any;
 
 export default function OrganizationPage() {
   const [data, setData] = useState<Organization[]>([]);
@@ -134,7 +154,23 @@ export default function OrganizationPage() {
   });
 
   return (
-    <div className="w-full">
+    <Main>
+      <PageHeader
+        title="Organizations"
+        subtitle="Here’s a list of all your partner organizations."
+        actions={
+          <div className="flex gap-2 items-center">
+            {/* Add Dialog Button + Prompt */}
+            <AddOrganizationDialog onSuccess={fetchOrganizations} />
+            <ExportDropdown
+              data={data}
+              columns={exportColumns}
+              fileName={`Organizations_${moment().format('MMDD')}`}
+            />
+          </div>
+        }
+      />
+
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter names..."
@@ -143,9 +179,6 @@ export default function OrganizationPage() {
           className="max-w-sm"
         />
         <div className="flex items-center gap-2">
-          {/* Add Dialog Button + Prompt */}
-          <AddOrganizationDialog onSuccess={fetchOrganizations} />
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
@@ -266,6 +299,6 @@ export default function OrganizationPage() {
         open={openEditDialog}
         onOpenChange={setOpenEditDialog}
       />
-    </div>
+    </Main>
   );
 }

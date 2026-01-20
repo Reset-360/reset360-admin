@@ -31,7 +31,25 @@ import {
 } from '@/src/components/ui/dropdown-menu';
 import columns from './components/TableColumn';
 import ViewAssessmentDialog from './components/ViewEntitlementDialog';
-import { Entitlement } from '@/src/types/entitlementTypes';
+import { EEntitlementSource, Entitlement } from '@/src/types/entitlementTypes';
+import { Main } from '@/src/components/layout/main';
+import { PageHeader } from '@/src/components/layout/page-header';
+import { ExportDropdown } from '@/src/components/common/ExportDropdown';
+import moment from 'moment';
+import { EntitlementSourceLabelText } from '@/src/components/common/adapts/EntitlementSourceLabel';
+
+const exportColumns = [
+  { header: 'Reference Id', accessorKey: 'ref' },
+  {
+    header: 'Client Name',
+    accessorKey: 'clientProfile',
+    accessorFn: (r: any) => r.clientProfile?.firstName + ' ' + r.clientProfile?.lastName,
+  },
+  { header: 'Status', accessorKey: 'status' },
+  { header: 'Source', accessorKey: 'source', accessorFn: (r: any) => EntitlementSourceLabelText[r.source as EEntitlementSource] },
+  { header: 'Type', accessorKey: 'type' },
+  { header: 'Attempts', accessorKey: 'attemptsUsed', accessorFn: (r: any) => `${r.attemptsUsed}/${r.maxAttempts}` },
+] as any;
 
 export default function EntitlementPage() {
   const [data, setData] = useState<Entitlement[]>([]);
@@ -92,7 +110,21 @@ export default function EntitlementPage() {
   });
 
   return (
-    <div className="w-full">
+    <Main>
+      <PageHeader
+        title="Entitlements"
+        subtitle="Manage client entitlements for ADAPTS test access, with status, source, and type details."
+        actions={
+          <div className="flex gap-2 items-center">
+            <ExportDropdown
+              data={data}
+              columns={exportColumns}
+              fileName={`Entitlements_${moment().format('MMDD')}`}
+            />
+          </div>
+        }
+      />
+
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter..."
@@ -207,6 +239,6 @@ export default function EntitlementPage() {
         onOpenChange={setOpenViewDialog}
         entitlement={currentData}
       />
-    </div>
+    </Main>
   );
 }

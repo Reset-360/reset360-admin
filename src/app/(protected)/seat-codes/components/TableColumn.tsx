@@ -60,6 +60,7 @@ const TableColumn: ColumnDef<SeatCode>[] = [
     accessorFn: (row) => row.cohortId?.name, // ✅ extract nested value
     header: 'Cohort',
     cell: ({ row }) => <div className="capitalize">{row.getValue('cohortId')}</div>,
+    
   },
   {
     accessorKey: 'type',

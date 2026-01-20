@@ -30,13 +30,46 @@ import {
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
 import columns from './components/TableColumn';
-import { Cohort } from '@/src/types/cohortTypes';
+import {
+  Cohort,
+  EducationLevelLabels,
+  EEducationLevel,
+} from '@/src/types/cohortTypes';
 import { toast } from 'sonner';
 import AddCohortDialog from './components/AddCohortDialog';
 import { Organization } from '@/src/types/organizationTypes';
 import DeleteDialog from '@/src/components/common/DeleteDialog';
 import EditCohortDialog from './components/EditCohortDialog';
 import ViewCohortDialog from './components/ViewCohortDialog';
+import { Main } from '@/src/components/layout/main';
+import { PageHeader } from '@/src/components/layout/page-header';
+import { ExportDropdown } from '@/src/components/common/ExportDropdown';
+import moment from 'moment';
+
+const exportColumns = [
+  {
+    header: 'Reference ID',
+    accessorKey: 'ref',
+    accessorFn: (r: any) => r.ref,
+  },
+  { header: 'Name', accessorKey: 'name' },
+  {
+    header: 'Organization',
+    accessorKey: 'organizationId',
+    accessorFn: (r: any) => r.organizationId?.name,
+  },
+  {
+    header: 'Education Level',
+    accessorKey: 'educationLevel',
+    accessorFn: (r: any) =>
+      EducationLevelLabels[r.educationLevel as EEducationLevel],
+  },
+  {
+    header: 'Status',
+    accessorKey: 'isActive',
+    accessorFn: (r: any) => (r.isActive ? 'Active' : 'Inactive'),
+  },
+] as any;
 
 export default function CohortPage() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -149,7 +182,27 @@ export default function CohortPage() {
   });
 
   return (
-    <div className="w-full">
+    <Main>
+      <PageHeader
+        title="Cohorts"
+        subtitle="Manage cohort records, details, and assignments."
+        actions={
+          <div className="flex gap-2 items-center">
+            {/* Add Dialog Button + Prompt */}
+            <AddCohortDialog
+              organizations={organizations}
+              onSuccess={fetchCohorts}
+            />
+
+            <ExportDropdown
+              data={data}
+              columns={exportColumns}
+              fileName={`Cohorts_${moment().format('MMDD')}`}
+            />
+          </div>
+        }
+      />
+
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter names..."
@@ -158,12 +211,6 @@ export default function CohortPage() {
           className="max-w-sm"
         />
         <div className="flex items-center gap-2">
-          {/* Add Dialog Button + Prompt */}
-          <AddCohortDialog
-            organizations={organizations}
-            onSuccess={fetchCohorts}
-          />
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
@@ -276,7 +323,7 @@ export default function CohortPage() {
         open={openViewDialog}
         onOpenChange={setOpenViewDialog}
         cohort={currentData}
-       />
+      />
 
       <EditCohortDialog
         onSuccess={refreshState}
@@ -285,6 +332,6 @@ export default function CohortPage() {
         open={openEditDialog}
         onOpenChange={setOpenEditDialog}
       />
-    </div>
+    </Main>
   );
 }

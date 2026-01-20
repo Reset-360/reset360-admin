@@ -1,8 +1,9 @@
+import { Header } from '@/src/components/layout/header';
 import AppSidebar from '@/src/components/layout/sidebar';
-import TopNav from '@/src/components/layout/topnav';
+import { ThemeModeToggle } from '@/src/components/layout/theme-mode-toggle';
+import { ProfileDropdown } from '@/src/components/profile-dropdown';
 import { SidebarProvider } from '@/src/components/ui/sidebar';
 import ProtectedRoute from '@/src/lib/protected-route';
-
 
 export default function DashboardLayout({
   children,
@@ -11,12 +12,18 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedRoute>
-      <SidebarProvider defaultOpen={false}>
+      <SidebarProvider defaultOpen={true}>
         <AppSidebar />
-        <main className="w-full pl-2 pr-4">
-          <TopNav />
 
-          <div className="py-2">{children}</div>
+        <main className="w-full">
+          <Header>
+            <div className="ms-auto flex items-center space-x-4">
+              <ThemeModeToggle />
+              <ProfileDropdown />
+            </div>
+          </Header>
+
+          {children}
         </main>
       </SidebarProvider>
     </ProtectedRoute>

@@ -32,6 +32,40 @@ import {
 import columns from './components/TableColumn';
 import { Assessment } from '@/src/types/assessmentTypes';
 import ViewAssessmentDialog from './components/ViewAssessmentDialog';
+import { Main } from '@/src/components/layout/main';
+import { PageHeader } from '@/src/components/layout/page-header';
+import { ExportDropdown } from '@/src/components/common/ExportDropdown';
+import moment from 'moment';
+
+const exportColumns = [
+  { header: 'Reference Id', accessorKey: 'ref' },
+  {
+    header: 'Client Name',
+    accessorKey: 'clientProfile',
+    accessorFn: (r: any) =>
+      r.clientProfile?.firstName + ' ' + r.clientProfile?.lastName,
+  },
+  {
+    header: 'Seat Code',
+    accessorKey: 'seatCode',
+    accessorFn: (r: any) => r.seatCode?.code,
+  },
+  { header: 'Risk Level', accessorKey: 'riskLevel' },
+  {
+    header: 'Total Rating',
+    accessorKey: 'totalRating',
+  },
+  {
+    header: 'tScore',
+    accessorKey: 'tScore',
+  },
+  { header: 'Type', accessorKey: 'type' },
+  {
+    header: 'Status',
+    accessorKey: 'status',
+    accessorFn: (r: any) => (r.submittedAt ? 'Completed' : 'Started'),
+  },
+] as any;
 
 export default function AssessmentPage() {
   const [data, setData] = useState<Assessment[]>([]);
@@ -92,7 +126,21 @@ export default function AssessmentPage() {
   });
 
   return (
-    <div className="w-full">
+    <Main>
+      <PageHeader
+        title="ADAPTS Results"
+        subtitle="Central hub for reviewing ADAPTS test scores and risk evaluations."
+        actions={
+          <div className="flex gap-2 items-center">
+            <ExportDropdown
+              data={data}
+              columns={exportColumns}
+              fileName={`Results_${moment().format('MMDD')}`}
+            />
+          </div>
+        }
+      />
+
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter..."
@@ -207,6 +255,6 @@ export default function AssessmentPage() {
         onOpenChange={setOpenViewDialog}
         assessment={currentData}
       />
-    </div>
+    </Main>
   );
 }

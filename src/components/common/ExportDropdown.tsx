@@ -1,0 +1,68 @@
+import React from 'react';
+import { Button } from '@/src/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/src/components/ui/dropdown-menu';
+import { FileDown } from 'lucide-react';
+import {
+  ColumnDef,
+  exportToCSV,
+  exportToExcel,
+  exportToPDF,
+} from '@/src/lib/export-util';
+
+type ExportDropdownProps<T> = {
+  data: T[];
+  columns: ColumnDef<T>[];
+  fileName?: string;
+};
+
+export function ExportDropdown<T>({
+  data,
+  columns,
+  fileName,
+}: ExportDropdownProps<T>) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="gap-2">
+          <FileDown className="h-4 w-4" />
+          Export
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuLabel>Export as</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            exportToExcel(data, columns, fileName);
+          }}
+        >
+          XLSX (Excel)
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            exportToCSV(data, columns, fileName);
+          }}
+        >
+          CSV
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            exportToPDF(data, columns, fileName);
+          }}
+        >
+          PDF
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
