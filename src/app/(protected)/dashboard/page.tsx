@@ -27,9 +27,34 @@ import {
   TicketSlash,
   TrendingUp,
   Users,
+  XCircle,
 } from 'lucide-react';
 import { PageHeader } from '@/src/components/layout/page-header';
-import { ResultStatCard } from './components/ResultStatCard';
+import StatCard from './components/StatCard';
+import RiskDistributionChart from './components/RiskDistributionChart';
+import TrendChart from './components/TrendChart';
+
+type TrendStat = {
+  date: string;
+  lowRisk: number;
+  mediumRisk: number;
+  highRisk: number;
+};
+
+const DEFAULT_TREND_STATS: TrendStat[] = [
+  { date: 'Jan', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Feb', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Mar', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Apr', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'May', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Jun', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Jul', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Aug', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Sep', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Oct', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Nov', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+  { date: 'Dec', lowRisk: 0, mediumRisk: 0, highRisk: 0 },
+];
 
 export default function DashboardPage() {
   const [results, setResults] = useState({
@@ -46,14 +71,19 @@ export default function DashboardPage() {
     totalSeatsNotRedeemed: 0,
   });
 
+  const [trendStats, setTrendStats] =
+    useState<TrendStat[]>(DEFAULT_TREND_STATS);
+
   useEffect(() => {
     Promise.all([
       api.get('/seat-batches/stats'),
       api.get('/assessments/stats/completed'),
+      api.get('/assessments/stats/risk-trend'),
     ])
-      .then(([seatsRes, assessmentsRes]) => {
+      .then(([seatsRes, assessmentsRes, trendRes]) => {
         setSeatStats(seatsRes.data);
         setResults(assessmentsRes.data);
+        setTrendStats(trendRes.data);
       })
       .catch(() => toast.error('Error fetching stats data'));
   }, []);
@@ -83,37 +113,52 @@ export default function DashboardPage() {
           {/* Stats Cards */}
           <p className="tracking-widest font-bold text-md">ADAPTS Results</p>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <ResultStatCard
-              icon={Users}
-              iconColor="text-primary"
-              iconBg="bg-primary/10"
-              label="Total Assessments"
+            <StatCard
+              title="Total Assessments"
               value={results.totalCompleted}
+              icon={Users}
+              variant="default"
             />
-            <ResultStatCard
-              icon={Shield}
-              iconColor="text-emerald-400"
-              iconBg="bg-emerald-500/10"
-              label="Low Risk"
+            <StatCard
+              title="Low Risk"
               value={results.lowRisk}
-              valueColor="text-emerald-400"
+              icon={Shield}
+              variant="low"
             />
-            <ResultStatCard
-              icon={TrendingUp}
-              iconColor="text-amber-400"
-              iconBg="bg-amber-500/10"
-              label="Medium Risk"
+            <StatCard
+              title="Medium Risk"
               value={results.mediumRisk}
-              valueColor="text-amber-400"
-            />
-            <ResultStatCard
               icon={AlertTriangle}
-              iconColor="text-red-400"
-              iconBg="bg-red-500/10"
-              label="High Risk"
-              value={results.highRisk}
-              valueColor="text-red-400"
+              variant="medium"
             />
+            <StatCard
+              title="High Risk"
+              value={results.highRisk}
+              icon={XCircle}
+              variant="high"
+            />
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-5">
+            {/* Risk Distribution */}
+            <div className="rounded-xl border border-border bg-card p-6 lg:col-span-2">
+              <h2 className="mb-4 text-lg font-semibold text-foreground">
+                Risk Distribution
+              </h2>
+              <div className="h-[280px]">
+                <RiskDistributionChart data={results} />
+              </div>
+            </div>
+
+            {/* Trend Over Time */}
+            <div className="rounded-xl border border-border bg-card p-6 lg:col-span-3">
+              <h2 className="mb-4 text-lg font-semibold text-foreground">
+                Assessment Trends
+              </h2>
+              <div className="h-[280px]">
+                <TrendChart data={trendStats} />
+              </div>
+            </div>
           </div>
 
           {/* Seat Stats */}

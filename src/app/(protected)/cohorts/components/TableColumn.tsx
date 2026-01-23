@@ -37,21 +37,25 @@ const TableColumn: ColumnDef<Cohort>[] = [
     cell: ({ row }) => <div className="capitalize">{row.getValue('name')}</div>,
   },
   {
-    accessorKey: 'organizationId',
-    accessorFn: (row) => row.organizationId?.name, // ✅ extract nested value
-    id: 'organizationName',
+    id: 'organizationId',
+    accessorFn: (row) => row.organizationId?._id, // ✅ filter value
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        Organization Name
+        Organization
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('organizationName')}</div>
-    ),
+    cell: ({ row }) => {
+      const org = row.original.organizationId;
+      return <div className="capitalize">{org?.name ?? '-'}</div>;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+      return row.getValue(columnId) === filterValue;
+    },
   },
   {
     accessorKey: 'educationLevel',

@@ -1,4 +1,5 @@
 import { ClientProfile } from './clientTypes';
+import { Organization } from './organizationTypes';
 import { SeatCode } from './seatCodeTypes';
 
 export enum EAssessmentType {
@@ -41,4 +42,5 @@ export type Assessment = {
   updatedAt: Date;
   clientProfile?: ClientProfile
   seatCode?: SeatCode
+  organization: Organization
 }

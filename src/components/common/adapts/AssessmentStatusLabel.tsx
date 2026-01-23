@@ -3,8 +3,8 @@ const statusConfig = {
     label: 'Completed',
     className: 'text-green-500  text-sm',
   },
-  ['Started']: {
-    label: 'Started',
+  ['In Progress']: {
+    label: 'In Progress',
     className: 'text-orange-500 text-sm',
   },
 };
@@ -12,7 +12,7 @@ const statusConfig = {
 export function AssessmentStatusLabel({
   status,
 }: {
-  status: 'Completed' | 'Started';
+  status: 'Completed' | 'In Progress';
 }) {
   const { label, className } = statusConfig[status] ?? statusConfig[status];
 

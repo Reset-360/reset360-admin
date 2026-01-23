@@ -48,19 +48,46 @@ const TableColumn: ColumnDef<SeatCode>[] = [
     cell: ({ row }) => <RefItemIdLabel ref={row.getValue('batchId')} />,
   },
   {
-    accessorKey: 'organizationId',
     id: 'organizationId',
-    accessorFn: (row) => row.batchId?.organizationId?.name, // ✅ extract nested value
-    header: 'Organization',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('organizationId')}</div>,
+    accessorFn: (row) => row.batchId?.organizationId?._id, // ✅ filter value
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Organization
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const org = row.original.batchId?.organizationId;
+      return <div className="capitalize">{org?.name ?? '-'}</div>;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+      return row.getValue(columnId) === filterValue;
+    },
   },
   {
-    accessorKey: 'cohortId',
     id: 'cohortId',
-    accessorFn: (row) => row.cohortId?.name, // ✅ extract nested value
-    header: 'Cohort',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('cohortId')}</div>,
-    
+    accessorFn: (row) => row.cohortId?._id, // ✅ filter value
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Cohort
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const cohort = row.original.cohortId;
+      return <div className="capitalize">{cohort?.name ?? ''}</div>;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+      return row.getValue(columnId) === filterValue;
+    },
   },
   {
     accessorKey: 'type',
@@ -78,6 +105,10 @@ const TableColumn: ColumnDef<SeatCode>[] = [
     cell: ({ row }) => (
       <AdaptsTypeBadge type={row.getValue('type')} />
     ),
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+      return row.getValue(columnId) === filterValue;
+    },
   },
   {
     accessorKey: 'status',

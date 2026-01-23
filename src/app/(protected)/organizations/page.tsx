@@ -163,7 +163,7 @@ export default function OrganizationPage() {
             {/* Add Dialog Button + Prompt */}
             <AddOrganizationDialog onSuccess={fetchOrganizations} />
             <ExportDropdown
-              data={data}
+              data={table.getFilteredRowModel().rows}
               columns={exportColumns}
               fileName={`Organizations_${moment().format('MMDD')}`}
             />
@@ -172,12 +172,14 @@ export default function OrganizationPage() {
       />
 
       <div className="flex items-center justify-between py-4">
-        <Input
-          placeholder="Filter names..."
-          value={(table.getState().globalFilter as string) ?? ''}
-          onChange={(event) => table.setGlobalFilter(event.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex items-center justify-between gap-2">
+          <Input
+            placeholder="Filter names..."
+            value={(table.getState().globalFilter as string) ?? ''}
+            onChange={(event) => table.setGlobalFilter(event.target.value)}
+          />
+        </div>
+        
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

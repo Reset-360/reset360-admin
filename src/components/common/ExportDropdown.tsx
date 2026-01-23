@@ -41,7 +41,10 @@ export function ExportDropdown<T>({
         <DropdownMenuItem
           onSelect={(e) => {
             e.preventDefault();
-            exportToExcel(data, columns, fileName);
+
+            // extract original data from table
+            const exportData = data.map((row: any) => row.original);
+            exportToExcel(exportData, columns, fileName);
           }}
         >
           XLSX (Excel)
@@ -49,7 +52,10 @@ export function ExportDropdown<T>({
         <DropdownMenuItem
           onSelect={(e) => {
             e.preventDefault();
-            exportToCSV(data, columns, fileName);
+
+            // extract original data from table
+            const exportData = data.map((row: any) => row.original);
+            exportToCSV(exportData, columns, fileName);
           }}
         >
           CSV
@@ -57,7 +63,9 @@ export function ExportDropdown<T>({
         <DropdownMenuItem
           onSelect={(e) => {
             e.preventDefault();
-            exportToPDF(data, columns, fileName);
+            // extract original data from table
+            const exportData = data.map((row: any) => row.original);
+            exportToPDF(exportData, columns, fileName);
           }}
         >
           PDF

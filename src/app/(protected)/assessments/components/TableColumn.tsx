@@ -26,22 +26,44 @@ const TableColumn: ColumnDef<Assessment>[] = [
     cell: ({ row }) => <RefItemIdLabel ref={row.getValue('ref')} />,
   },
   {
-      accessorKey: 'clientId',
-      accessorFn: (row) => `${row.clientProfile?.firstName} ${row.clientProfile?.lastName}`, // ✅ extract nested value
-      id: 'clientId',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Client Name
-          <ArrowUpDown />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue('clientId')}</div>
-      ),
+    accessorKey: 'clientId',
+    accessorFn: (row) =>
+      `${row.clientProfile?.firstName} ${row.clientProfile?.lastName}`, // ✅ extract nested value
+    id: 'clientId',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Client Name
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue('clientId')}</div>
+    ),
+  },
+  {
+    id: 'organizationId',
+    accessorFn: (row) => row.organization?._id, // ✅ filter value
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Organization
+        <ArrowUpDown />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const org = row.original.organization;
+      return <div className="capitalize">{org?.name ?? '-'}</div>;
     },
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+      return row.getValue(columnId) === filterValue;
+    },
+  },
   {
     accessorKey: 'riskBand',
     header: ({ column }) => {
@@ -59,6 +81,10 @@ const TableColumn: ColumnDef<Assessment>[] = [
       const riskBandValue = row.getValue('riskBand') as ERiskBand;
       return <RiskBandBadge riskBand={riskBandValue} />;
     },
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+      return row.getValue(columnId) === filterValue;
+    },
   },
   {
     accessorKey: 'type',
@@ -74,6 +100,10 @@ const TableColumn: ColumnDef<Assessment>[] = [
       );
     },
     cell: ({ row }) => <AdaptsTypeBadge type={row.getValue('type')} />,
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+      return row.getValue(columnId) === filterValue;
+    },
   },
   {
     accessorKey: 'totalRating',
@@ -124,9 +154,18 @@ const TableColumn: ColumnDef<Assessment>[] = [
     },
     cell: ({ row }) => (
       <AssessmentStatusLabel
-        status={row.getValue('submittedAt') ? 'Completed' : 'Started'}
+        status={row.getValue('submittedAt') ? 'Completed' : 'In Progress'}
       />
     ),
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+
+      const submittedAt = row.getValue(columnId);
+      const status = submittedAt ? 'COMPLETED' : 'IN-PROGRESS'; // <-- changed
+
+      return status === filterValue;
+    },
+
   },
   {
     id: 'actions',

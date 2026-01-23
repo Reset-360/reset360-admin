@@ -117,7 +117,7 @@ export default function EntitlementPage() {
         actions={
           <div className="flex gap-2 items-center">
             <ExportDropdown
-              data={data}
+              data={table.getFilteredRowModel().rows}
               columns={exportColumns}
               fileName={`Entitlements_${moment().format('MMDD')}`}
             />
@@ -126,12 +126,14 @@ export default function EntitlementPage() {
       />
 
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter..."
-          value={(table.getState().globalFilter as string) ?? ''}
-          onChange={(event) => table.setGlobalFilter(event.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex items-center justify-between gap-2">
+          <Input
+            placeholder="Filter names..."
+            value={(table.getState().globalFilter as string) ?? ''}
+            onChange={(event) => table.setGlobalFilter(event.target.value)}
+          />
+        </div>
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

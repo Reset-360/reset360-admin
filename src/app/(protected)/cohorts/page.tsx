@@ -45,6 +45,13 @@ import { Main } from '@/src/components/layout/main';
 import { PageHeader } from '@/src/components/layout/page-header';
 import { ExportDropdown } from '@/src/components/common/ExportDropdown';
 import moment from 'moment';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/components/ui/select';
 
 const exportColumns = [
   {
@@ -85,6 +92,8 @@ export default function CohortPage() {
     []
   );
 
+  const [filterOrg, setFilterOrg] = useState('all');
+
   const fetchOrganizations = useCallback(async () => {
     try {
       const response = await api.get('/organizations');
@@ -111,6 +120,16 @@ export default function CohortPage() {
     fetchOrganizations();
   }, [fetchOrganizations]);
 
+  useEffect(() => {
+    setColumnFilters((prev) => {
+      const next = prev.filter((f) => f.id !== 'organizationId');
+
+      if (filterOrg === 'all') return next;
+
+      return [...next, { id: 'organizationId', value: filterOrg }];
+    });
+  }, [filterOrg, setColumnFilters]);
+
   const getDataById = (id: string) => data.find((d) => d._id === id);
 
   const refreshState = () => {
@@ -119,6 +138,7 @@ export default function CohortPage() {
     setOpenDeleteDialog(false);
     setOpenEditDialog(false);
     setOpenViewDialog(false);
+    setFilterOrg('all');
   };
 
   const handleView = (id: string) => {
@@ -195,7 +215,7 @@ export default function CohortPage() {
             />
 
             <ExportDropdown
-              data={data}
+              data={table.getFilteredRowModel().rows}
               columns={exportColumns}
               fileName={`Cohorts_${moment().format('MMDD')}`}
             />
@@ -204,12 +224,32 @@ export default function CohortPage() {
       />
 
       <div className="flex items-center justify-between py-4">
-        <Input
-          placeholder="Filter names..."
-          value={(table.getState().globalFilter as string) ?? ''}
-          onChange={(event) => table.setGlobalFilter(event.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex items-center justify-between gap-2">
+          <Input
+            placeholder="Filter names..."
+            value={(table.getState().globalFilter as string) ?? ''}
+            onChange={(event) => table.setGlobalFilter(event.target.value)}
+            className="max-w-xs"
+          />
+
+          <Select value={filterOrg} onValueChange={setFilterOrg}>
+            <SelectTrigger className="w-40">
+              <SelectValue>
+                {organizations.find((o) => o._id === filterOrg)?.name ??
+                  'All Organizations'}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Organizations</SelectItem>
+              {organizations.map((org) => (
+                <SelectItem key={org._id} value={org._id}>
+                  {org.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
