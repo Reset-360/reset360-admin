@@ -1,0 +1,278 @@
+'use client';
+
+import React, { useCallback, useEffect, useState } from 'react';
+import { Input } from '@/src/components/ui/input';
+import { Button } from '@/src/components/ui/button';
+import api from '@/src/lib/axios';
+import {
+  ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from '@tanstack/react-table';
+import { ChevronDown } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/src/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/src/components/ui/dropdown-menu';
+import columns from './components/TableColumn';
+import { toast } from 'sonner';
+import { Main } from '@/src/components/layout/main';
+import { PageHeader } from '@/src/components/layout/page-header';
+import { ExportDropdown } from '@/src/components/common/ExportDropdown';
+import moment from 'moment';
+import ViewPurchaseDialog from './components/ViewPurchaseDialog';
+import { Purchase } from '@/src/types/purchaseTypes';
+import { formatCents } from '@/src/lib/helper';
+
+const exportColumns = [
+  {
+    header: 'Reference ID',
+    accessorKey: 'ref',
+    accessorFn: (r: any) => r.ref,
+  },
+  {
+    header: 'Buyer Type',
+    accessorKey: 'type',
+    accessorFn: (r: any) => r.buyer.type,
+  },
+  {
+    header: 'Organization',
+    accessorKey: 'organization',
+    accessorFn: (r: any) => r.buyer.organizationName,
+  },
+  {
+    header: 'Name',
+    accessorKey: 'name',
+    accessorFn: (r: any) => r.buyer.contactName,
+  },
+  {
+    header: 'Email',
+    accessorKey: 'email',
+    accessorFn: (r: any) => r.buyer.contactEmail,
+  },
+  {
+    header: 'Phone',
+    accessorKey: 'phone',
+    accessorFn: (r: any) => r.buyer.contactPhone,
+  },
+  {
+    header: 'Amount',
+    accessorKey: 'amount',
+    accessorFn: (r: any) => formatCents(r.pricingSnapshot.totalAmount),
+  },
+  { header: 'Status', accessorKey: 'status' },
+  { header: 'Created At', accessorKey: 'createdAt', accessorFn: (r: any) => moment(r.createdAt).format('MMM DD,YYYY hh:mm A') },
+] as any;
+
+export default function PurchasePage() {
+  const [data, setData] = useState<Purchase[]>([]);
+  const [currentData, setCurrentData] = useState<Purchase>();
+
+  const [openViewDialog, setOpenViewDialog] = useState(false);
+
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+
+  const fetchPurchases = useCallback(async () => {
+    try {
+      const response = await api.get('/purchases');
+      setData(response.data);
+    } catch {
+      toast.error('Error fetching payments');
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPurchases();
+  }, [fetchPurchases]);
+
+  const getPaymentById = (id: string) => data.find((org) => org._id === id);
+
+  const refreshState = () => {
+    fetchPurchases();
+    setCurrentData(undefined);
+    setOpenViewDialog(false);
+  };
+
+  const handleView = (id: string) => {
+    const payment = getPaymentById(id);
+
+    if (payment) {
+      setCurrentData(payment);
+      setOpenViewDialog(true);
+    }
+  };
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+    },
+    meta: {
+      viewItem: handleView,
+    },
+  });
+
+  return (
+    <Main>
+      <PageHeader
+        title="Purchases"
+        subtitle="Here’s a list of all purchase records"
+        actions={
+          <div className="flex gap-2 items-center">
+            {/* Add Dialog Button + Prompt */}
+            <ExportDropdown
+              data={table.getFilteredRowModel().rows}
+              columns={exportColumns}
+              fileName={`Purchases_${moment().format('MMDD')}`}
+              orientation={'l'}
+            />
+          </div>
+        }
+      />
+
+      <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between gap-2">
+          <Input
+            placeholder="Filter names..."
+            value={(table.getState().globalFilter as string) ?? ''}
+            onChange={(event) => table.setGlobalFilter(event.target.value)}
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+      <div className="overflow-hidden rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={table.getVisibleLeafColumns().length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="text-muted-foreground flex-1 text-xs">
+          Total of {table.getRowCount()} records
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+
+      <ViewPurchaseDialog
+        data={currentData}
+        open={openViewDialog}
+        onOpenChange={setOpenViewDialog}
+      />
+    </Main>
+  );
+}

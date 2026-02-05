@@ -80,9 +80,12 @@ export function exportToCSV<T>(
 export function exportToPDF<T>(
   data: T[],
   columns: { header: string; accessorKey?: keyof T; accessorFn?: (row: T) => any }[],
-  fileName?: string
+  fileName?: string,
+  orientation?: 'p' | 'l'
 ) {
-   const doc = new jsPDF()
+   const doc = new jsPDF({
+    orientation: orientation ? orientation : 'p'
+   })
 
   const head = [columns.map((c) => c.header)]
   const body = data.map((row) =>

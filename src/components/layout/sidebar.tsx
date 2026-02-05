@@ -1,27 +1,19 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
   SidebarHeader,
   SidebarFooter,
 } from '@/src/components/ui/sidebar';
 import { LogOut } from 'lucide-react';
 import Image from 'next/image';
-import { cn } from '@/src/lib/utils';
 import useLogout from '@/src/hooks/useLogout';
-import { menuItems } from '@/src/constants/menu';
+import { sidebarData } from '@/src/constants/sidebar-data';
+import { NavGroup } from './nav-group';
 
 export default function AppSidebar() {
-  const pathname = usePathname();
   const logout = useLogout()
 
   return (
@@ -41,37 +33,9 @@ export default function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Actions</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => {
-                const isActive = pathname.startsWith(item.href);
-                return (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      className={cn(
-                        'flex items-center gap-2',
-                        isActive && 'bg-blue-600 text-white hover:bg-blue-700'
-                      )}
-                    >
-                      <Link
-                        href={item.href}
-                        className="flex items-center gap-2"
-                      >
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-              <SidebarMenuItem></SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {sidebarData.navGroups.map((props) => (
+          <NavGroup key={props.title} {...props} />
+        ))}
       </SidebarContent>
 
       <SidebarFooter>
