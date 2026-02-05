@@ -20,12 +20,14 @@ type ExportDropdownProps<T> = {
   data: T[];
   columns: ColumnDef<T>[];
   fileName?: string;
+  orientation?: 'p' | 'l'
 };
 
 export function ExportDropdown<T>({
   data,
   columns,
   fileName,
+  orientation
 }: ExportDropdownProps<T>) {
   return (
     <DropdownMenu>
@@ -65,7 +67,7 @@ export function ExportDropdown<T>({
             e.preventDefault();
             // extract original data from table
             const exportData = data.map((row: any) => row.original);
-            exportToPDF(exportData, columns, fileName);
+            exportToPDF(exportData, columns, fileName, orientation);
           }}
         >
           PDF

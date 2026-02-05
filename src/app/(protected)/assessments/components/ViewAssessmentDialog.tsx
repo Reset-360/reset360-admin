@@ -137,7 +137,7 @@ export default function ViewAssessmentDialog({
             label="Status"
             component={
               <AssessmentStatusLabel
-                status={assessment.submittedAt ? 'Completed' : 'Started'}
+                status={assessment.submittedAt ? 'Completed' : 'In Progress'}
               />
             }
           />
