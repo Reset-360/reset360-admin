@@ -5,6 +5,8 @@ export const AdaptsPriceTierSchema = z.object({
   minQty: z.number('Min qty is required').int().min(1),
   maxQty: z.number('Max qty is required').int().min(1),
   unitAmount: z.number('Unit amount is required').int().min(1, 'Price amount cannot be less than or equal to 0.00'), // centavos
+  description: z.string().optional(),
+  features: z.array(z.string()).default([])
 }).refine(
   (data) => data.maxQty > data.minQty,
   {

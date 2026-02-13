@@ -1,3 +1,4 @@
+import { Badge } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';
 import {
   Dialog,
@@ -9,6 +10,7 @@ import {
 } from '@/src/components/ui/dialog';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
+import { Textarea } from '@/src/components/ui/textarea';
 import {
   AdaptsPriceTierSchema,
   AdaptsPriceTierValues,
@@ -16,7 +18,7 @@ import {
 import api from '@/src/lib/axios';
 import { toCents } from '@/src/lib/helper';
 import { Field, Form, Formik } from 'formik';
-import { Plus } from 'lucide-react';
+import { Check, Plus, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
@@ -24,11 +26,14 @@ import { toFormikValidationSchema } from 'zod-formik-adapter';
 const AddTierDialog = ({ refresh }: { refresh: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const initialValues: AdaptsPriceTierValues = {
+  const initialValues: AdaptsPriceTierValues & { newFeature: string } = {
     name: '',
     minQty: 1,
     maxQty: 1,
     unitAmount: 0,
+    description: '',
+    features: [] as string[],
+    newFeature: '',
   };
 
   const handleSubmit = async (
@@ -74,7 +79,7 @@ const AddTierDialog = ({ refresh }: { refresh: () => void }) => {
           validationSchema={toFormikValidationSchema(AdaptsPriceTierSchema)}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched, isSubmitting }) => (
+          {({ values, errors, touched, isSubmitting, setFieldValue }) => (
             <Form className="grid gap-4">
               {/* Name */}
               <div className="flex flex-col gap-1">
@@ -95,6 +100,25 @@ const AddTierDialog = ({ refresh }: { refresh: () => void }) => {
                   {touched.name && errors.name && (
                     <p className="text-red-500 text-xs mt-1">{errors.name}</p>
                   )}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="flex flex-col gap-1">
+                <Label htmlFor="description" className="text-right text-xs">
+                  Description
+                </Label>
+                <div className="col-span-3">
+                  <Field name="description">
+                    {({ field }: { field: any }) => (
+                      <Textarea
+                        {...field}
+                        id="description"
+                        placeholder="Enter tier description"
+                        rows={3}
+                      />
+                    )}
+                  </Field>
                 </div>
               </div>
 
@@ -173,6 +197,78 @@ const AddTierDialog = ({ refresh }: { refresh: () => void }) => {
                   )}
                 </div>
               </div>
+
+              {/* Features */}
+              <div className="flex flex-col gap-1">
+                <Label htmlFor="newFeature" className="text-right text-xs">
+                  Feature
+                </Label>
+                <div className="flex gap-2">
+                  <Field name="newFeature">
+                    {({ field }: { field: any }) => (
+                      <Input
+                        {...field}
+                        id="newFeature"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && values.newFeature.trim()) {
+                            e.preventDefault();
+                            setFieldValue('features', [
+                              ...values.features,
+                              values.newFeature.trim(),
+                            ]);
+                            setFieldValue('newFeature', '');
+                          }
+                        }}
+                      />
+                    )}
+                  </Field>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      if (values.newFeature.trim()) {
+                        setFieldValue('features', [
+                          ...values.features,
+                          values.newFeature.trim(),
+                        ]);
+                        setFieldValue('newFeature', '');
+                      }
+                    }}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Features List */}
+              {values.features.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {values.features.map((feature, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="gap-1 pr-1"
+                    >
+                      <Check className="w-3 h-3" />
+                      {feature}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFieldValue(
+                            'features',
+                            values.features.filter((_, i) => i !== index)
+                          )
+                        }
+                        className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
 
               {/* Buttons */}
               <div className="flex justify-end space-x-2 pt-4">

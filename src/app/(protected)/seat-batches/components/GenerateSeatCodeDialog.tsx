@@ -56,24 +56,36 @@ const GenerateSeatCodeDialog = ({
     type: EAssessmentType.ADAPTS_S,
     quantity: 1,
   };
-  console.log(seatBatch);
+  
   async function handleSubmit(values: GenerateSeatCodeValues) {
+    const start = performance.now();
+
     try {
       await api.post(
         `${process.env.NEXT_PUBLIC_API_URL}/seat-codes/generate`,
         values
       );
 
-      onSuccess?.();
-      toast.success(`Successfully generated ${values.quantity} seat codes`);
-    } catch (error: any) {
-      let message = 'Failed to generate seat codes';
+      const end = performance.now(); // end timer
+      const duration = ((end - start) / 1000).toFixed(2);
 
-      if (error.response.data.quantity) {
+      const message = `Successfully generated ${values.quantity} seat codes in ${duration} seconds`
+
+      onSuccess?.();
+      toast.success(message);
+      console.log(message);
+    } catch (error: any) {
+      const end = performance.now();
+      const duration = ((end - start) / 1000).toFixed(2);
+
+      let message = `Failed to generate seat codes (after ${duration} seconds)`;
+
+      if (error?.response?.data?.quantity) {
         message = error.response.data.quantity;
       }
 
       toast.error(message);
+      console.log(message)
     }
   }
 

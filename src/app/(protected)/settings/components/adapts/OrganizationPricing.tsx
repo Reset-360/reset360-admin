@@ -20,6 +20,7 @@ import {
 } from '@/src/types/settingsTypes';
 import { Field, Form, Formik } from 'formik';
 import {
+  Check,
   DollarSign,
   MoreHorizontal,
   Package,
@@ -48,6 +49,7 @@ import {
 import DeleteDialog from '@/src/components/common/DeleteDialog';
 import { toast } from 'sonner';
 import EditTierDialog from './EditTierDialog';
+import { Badge } from '@/src/components/ui/badge';
 
 type OrganizationPricingProps = {
   setting: IAdaptsPricingSettings;
@@ -112,7 +114,7 @@ const OrganizationPricing: React.FC<OrganizationPricingProps> = ({
               </CardDescription>
             </div>
 
-            {setting.tiers.length < 15 && <AddTierDialog refresh={refresh} />}
+            {setting.tiers.length < 3 && <AddTierDialog refresh={refresh} />}
           </div>
         </CardHeader>
 
@@ -130,7 +132,25 @@ const OrganizationPricing: React.FC<OrganizationPricingProps> = ({
             <TableBody>
               {tiers.map((tier, key) => (
                 <TableRow key={key}>
-                  <TableCell>{tier.name}</TableCell>
+                  <TableCell>
+                    {tier.name}
+                    <div className='italic'>{tier.description}</div>
+                    {/* Features List */}
+                    {tier.features.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {tier.features.map((feature, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="gap-1 pr-1"
+                          >
+                            <Check className="w-3 h-3" />
+                            {feature}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell>{tier.minQty}</TableCell>
                   <TableCell>{tier.maxQty ?? 'Unlimited'}</TableCell>
                   <TableCell>{formatCents(tier.unitAmount)}</TableCell>

@@ -26,6 +26,12 @@ const TableColumn: ColumnDef<Purchase>[] = [
     cell: ({ row }) => <RefItemIdLabel ref={row.getValue('ref')} />,
   },
   {
+    accessorKey: 'paymentRef',
+    accessorFn: (r) => (r.paymentId as any)?.ref,
+    header: 'Pyament Ref ID',
+    cell: ({ row }) => <RefItemIdLabel ref={row.getValue('paymentRef')} />,
+  },
+  {
     accessorKey: 'type',
     accessorFn: (r: any) => r.buyer.type,
     header: ({ column }) => {
@@ -59,6 +65,24 @@ const TableColumn: ColumnDef<Purchase>[] = [
     },
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue('organization')}</div>
+    ),
+  },
+  {
+    accessorKey: 'item',
+    accessorFn: (r: any) => r.items[0]?.code,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Item
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue('item')}</div>
     ),
   },
   {

@@ -7,6 +7,8 @@ export interface IAdaptsPriceTier {
   minQty: number;
   maxQty: number;
   unitAmount: number; // centavos
+  description: string;
+  features: string[];
 }
 
 export interface IAdaptsPricingSettings {

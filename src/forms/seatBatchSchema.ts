@@ -30,7 +30,7 @@ export const GenerateSeatCodeSchema = z.object({
     .number()
     .int()
     .min(1, 'Quantity must be at least 1')
-    .max(1000, 'Quantity too large'),
+    .max(5000, 'Quantity too large'),
 });
 
 export type GenerateSeatCodeValues = z.infer<typeof GenerateSeatCodeSchema>;

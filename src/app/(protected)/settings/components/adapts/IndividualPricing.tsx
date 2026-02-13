@@ -50,7 +50,7 @@ const IndividualPricing: React.FC<IndividualPricingProps> = ({ setting, refresh}
   };
 
   return (
-    <Card className="border-border/50">
+    <Card className="border-border/50 lg:max-w-2xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <PhilippinePeso className="w-5 h-5 text-primary" />
