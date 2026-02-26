@@ -8,8 +8,6 @@ import {
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
@@ -46,6 +44,22 @@ import {
 import { toast } from 'sonner';
 import { Organization } from '@/src/types/organizationTypes';
 import { Cohort } from '@/src/types/cohortTypes';
+import numeral from 'numeral';
+
+const PAGE_SIZE = 10;
+
+const typesOptions = [
+  { id: 'ADAPTS-S', value: 'ADAPTS-S' },
+  { id: 'ADAPTS-P', value: 'ADAPTS-P' },
+  { id: 'ADAPTS-T', value: 'ADAPTS-T' },
+  { id: 'ADAPTS-C', value: 'ADAPTS-C' },
+];
+
+const statusOptions = [
+  { id: 'UNUSED', value: ESeatCodeStatus.UNUSED },
+  { id: 'REDEEMED', value: ESeatCodeStatus.REDEEMED },
+  { id: 'EXPIRED', value: ESeatCodeStatus.EXPIRED },
+];
 
 const exportColumns = [
   {
@@ -68,51 +82,74 @@ const exportColumns = [
   { header: 'Status', accessorKey: 'status' },
 ] as any;
 
-const typesOptions = [
-  { id: 'ADAPTS-S', value: 'ADAPTS-S'},
-  { id: 'ADAPTS-P', value: 'ADAPTS-P'},
-  { id: 'ADAPTS-T', value: 'ADAPTS-T'},
-  { id: 'ADAPTS-C', value: 'ADAPTS-C'},
-]
-
-const statusOptions = [
-  { id: 'UNUSED', value: ESeatCodeStatus.UNUSED},
-  { id: 'REDEEMED', value: ESeatCodeStatus.REDEEMED},
-  { id: 'EXPIRED', value: ESeatCodeStatus.EXPIRED},
-]
-
 export default function SeatCodePage() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
-
   const [data, setData] = useState<SeatCode[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
   const [currentData, setCurrentData] = useState<SeatCode>();
-
   const [openViewDialog, setOpenViewDialog] = useState(false);
-
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [search, setSearch] = useState('');
   const [filterOrg, setFilterOrg] = useState('all');
   const [filterType, setFilterType] = useState('all');
   const [filterCohort, setFilterCohort] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [loading, setLoading] = useState(false);
+
+  // Debounce search so we don't fire on every keystroke
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  // Reset to page 1 whenever any filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [filterOrg, filterType, filterCohort, filterStatus, debouncedSearch]);
 
   const fetchSeatCodes = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await api.get('/seat-codes');
-      setData(response.data);
-    } catch (error) {
-      toast.error('Error fetching users:');
+      const params: Record<string, string> = {
+        page: String(page),
+        limit: String(PAGE_SIZE),
+      };
+      if (filterOrg !== 'all') params.organizationId = filterOrg;
+      if (filterCohort !== 'all') params.cohortId = filterCohort;
+      if (filterType !== 'all') params.type = filterType;
+      if (filterStatus !== 'all') params.status = filterStatus;
+      if (debouncedSearch) params.search = debouncedSearch;
+
+      const res = await api.get('/seat-codes', { params });
+      setData(res.data.data);
+      setTotal(res.data.total);
+      setTotalPages(res.data.totalPages);
+    } catch {
+      toast.error('Error fetching seat codes');
+    } finally {
+      setLoading(false);
     }
-  }, [])
+  }, [
+    page,
+    filterOrg,
+    filterCohort,
+    filterType,
+    filterStatus,
+    debouncedSearch,
+  ]);
+
+  useEffect(() => {
+    fetchSeatCodes();
+  }, [fetchSeatCodes]);
 
   const fetchOrganizations = useCallback(async () => {
     try {
-      const response = await api.get('/organizations');
-      setOrganizations(response.data);
+      const res = await api.get('/organizations');
+      setOrganizations(res.data);
     } catch {
       toast.error('Error fetching organizations');
     }
@@ -120,59 +157,32 @@ export default function SeatCodePage() {
 
   const fetchCohorts = useCallback(async () => {
     try {
-      const response = await api.get('/cohorts');
-      setCohorts(response.data);
+      const res = await api.get('/cohorts');
+      setCohorts(res.data);
     } catch {
       toast.error('Error fetching cohorts');
     }
   }, []);
 
   useEffect(() => {
-    fetchSeatCodes();
-  }, [fetchSeatCodes]);
-
-  useEffect(() => {
-      fetchOrganizations();
-    }, [fetchOrganizations]);
-
+    fetchOrganizations();
+  }, [fetchOrganizations]);
   useEffect(() => {
     fetchCohorts();
   }, [fetchCohorts]);
 
-  useEffect(() => {
-    setColumnFilters((prev) => {
-      const next = prev.filter(
-        (f) =>
-          !['organizationId', 'type', 'cohortId', 'status'].includes(f.id)
-      );
-
-      if (filterOrg !== 'all') {
-        next.push({ id: 'organizationId', value: filterOrg });
-      }
-
-      if (filterType !== 'all') {
-        next.push({ id: 'type', value: filterType });
-      }
-
-      if (filterCohort !== 'all') {
-        next.push({ id: 'cohortId', value: filterCohort });
-      }
-
-      if (filterStatus !== 'all') {
-        next.push({ id: 'status', value: filterStatus });
-      }
-
-      return next;
-    });
-  }, [filterOrg, filterType, filterCohort, filterStatus, setColumnFilters]);
-
-  const getDataById = (id: string) => data.find((d) => d._id === id);
+  const cohortOptions = useMemo(
+    () =>
+      filterOrg === 'all'
+        ? cohorts
+        : cohorts.filter((c) => c.organizationId?._id === filterOrg),
+    [filterOrg, cohorts]
+  );
 
   const handleView = (id: string) => {
-    const data = getDataById(id);
-
-    if (data) {
-      setCurrentData(data);
+    const item = data.find((d) => d._id === id);
+    if (item) {
+      setCurrentData(item);
       setOpenViewDialog(true);
     }
   };
@@ -180,28 +190,16 @@ export default function SeatCodePage() {
   const table = useReactTable({
     data,
     columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    // Pagination/filtering is server-driven; only keep sorting client-side if desired
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount: totalPages,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-    },
-    meta: {
-      viewItem: handleView,
-    },
+    onSortingChange: setSorting,
+    state: { sorting },
+    meta: { viewItem: handleView },
   });
-
-  const cohortOptions = useMemo(() => {
-    if (filterOrg == 'all') {
-      return cohorts
-    } else {
-      return cohorts.filter((c) => c.organizationId?._id == filterOrg)
-    }
-  }, [filterOrg, cohorts])
 
   return (
     <Main>
@@ -209,25 +207,29 @@ export default function SeatCodePage() {
         title="Seat Codes"
         subtitle="Manage and track seat codes by type and status."
         actions={
-          <div className="flex gap-2 items-center">
-            <ExportDropdown
-              data={table.getFilteredRowModel().rows}
-              columns={exportColumns}
-              fileName={`SeatCodes_${moment().format('MMDD')}`}
-            />
-          </div>
+          <ExportDropdown
+            data={data}
+            columns={exportColumns}
+            fileName={`SeatCodes_${moment().format('MMDD')}`}
+          />
         }
       />
 
       <div className="flex items-center justify-between py-4">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
           <Input
-            placeholder="Filter names..."
-            value={(table.getState().globalFilter as string) ?? ''}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
+            placeholder="Search code..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
 
-          <Select value={filterOrg} onValueChange={setFilterOrg}>
+          <Select
+            value={filterOrg}
+            onValueChange={(v) => {
+              setFilterOrg(v);
+              setFilterCohort('all');
+            }}
+          >
             <SelectTrigger className="w-40">
               <SelectValue>
                 {organizations.find((o) => o._id === filterOrg)?.name ??
@@ -253,9 +255,9 @@ export default function SeatCodePage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Cohorts</SelectItem>
-              {cohortOptions.map((cohort) => (
-                <SelectItem key={cohort._id} value={cohort._id}>
-                  {cohort.name}
+              {cohortOptions.map((c) => (
+                <SelectItem key={c._id} value={c._id}>
+                  {c.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -270,9 +272,9 @@ export default function SeatCodePage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              {typesOptions.map((type) => (
-                <SelectItem key={type.id} value={type.id}>
-                  {type.value}
+              {typesOptions.map((t) => (
+                <SelectItem key={t.id} value={t.id}>
+                  {t.value}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -281,72 +283,71 @@ export default function SeatCodePage() {
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-40">
               <SelectValue>
-                {statusOptions.find((s) => s.id === filterType)?.value ??
+                {statusOptions.find((s) => s.id === filterStatus)?.value ??
                   'All Status'}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
-              {statusOptions.map((type) => (
-                <SelectItem key={type.id} value={type.id}>
-                  {type.value}
+              {statusOptions.map((s) => (
+                <SelectItem key={s.id} value={s.id}>
+                  {s.value}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        
-        <div className="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columns <ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              Columns <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((c) => c.getCanHide())
+              .map((col) => (
+                <DropdownMenuCheckboxItem
+                  key={col.id}
+                  className="capitalize"
+                  checked={col.getIsVisible()}
+                  onCheckedChange={(v) => col.toggleVisibility(!!v)}
+                >
+                  {col.id}
+                </DropdownMenuCheckboxItem>
+              ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+            {table.getHeaderGroups().map((hg) => (
+              <TableRow key={hg.id}>
+                {hg.headers.map((h) => (
+                  <TableHead key={h.id}>
+                    {h.isPlaceholder
+                      ? null
+                      : flexRender(h.column.columnDef.header, h.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {loading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -375,25 +376,25 @@ export default function SeatCodePage() {
           </TableBody>
         </Table>
       </div>
+
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {numeral(total).format('0,0')} total row(s) — page {page} of {numeral(totalPages).format('0,0')}
         </div>
         <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => setPage((p) => p - 1)}
+            disabled={page <= 1 || loading}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => setPage((p) => p + 1)}
+            disabled={page >= totalPages || loading}
           >
             Next
           </Button>

@@ -43,23 +43,23 @@ const TableColumn: ColumnDef<SeatBatch>[] = [
       return row.getValue(columnId) === filterValue;
     },
   },
-  {
-    accessorKey: 'cohortId',
-    accessorFn: (row) => row.cohortId?.name, // ✅ extract nested value
-    id: 'cohortName',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Cohort
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('cohortName')}</div>
-    ),
-  },
+  // {
+  //   accessorKey: 'cohortId',
+  //   accessorFn: (row) => row.cohortId?.name, // ✅ extract nested value
+  //   id: 'cohortName',
+  //   header: ({ column }) => (
+  //     <Button
+  //       variant="ghost"
+  //       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+  //     >
+  //       Cohort
+  //       <ArrowUpDown />
+  //     </Button>
+  //   ),
+  //   cell: ({ row }) => (
+  //     <div className="capitalize">{row.getValue('cohortName')}</div>
+  //   ),
+  // },
   {
     accessorKey: 'totalSeats',
     header: ({ column }) => {
