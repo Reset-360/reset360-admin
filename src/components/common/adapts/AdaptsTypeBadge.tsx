@@ -24,8 +24,10 @@ export function AdaptsTypeBadge({ type }: { type: EAssessmentType }) {
   const { label, className } =
     typeConfig[type] ?? typeConfig[EAssessmentType.ADAPTS_S];
 
+  if (!type) return
+  
   return (
-    <Badge variant="secondary" className={className}>
+    <Badge variant="secondary" className={className ?? ''}>
       {label}
     </Badge>
   );

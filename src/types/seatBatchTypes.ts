@@ -1,6 +1,13 @@
 import { EAssessmentType } from './assessmentTypes';
 import { Organization } from './organizationTypes';
 
+export enum EGenerationStatus {
+  Queued = "QUEUED",
+  Generating = "GENERATING",
+  Done = "DONE",
+  Failed = "FAILED",
+}
+
 export type SeatBatch = {
   _id: string;
   ref?: string;
@@ -14,3 +21,4 @@ export type SeatBatch = {
   createdAt: Date;
   updatedAt: Date;
 }
+

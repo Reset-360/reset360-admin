@@ -12,9 +12,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu';
-import { SeatBatch } from '@/src/types/seatBatchTypes';
+import { EGenerationStatus, SeatBatch } from '@/src/types/seatBatchTypes';
 import { AdaptsTypeBadge } from '@/src/components/common/adapts/AdaptsTypeBadge';
 import RefItemIdLabel from '@/src/components/common/RefItemIdLabel';
+import { GenerationStatusBadge } from '@/src/components/common/seat-codes/GenerationStatusBadge';
 
 const TableColumn: ColumnDef<SeatBatch>[] = [
   {
@@ -110,6 +111,27 @@ const TableColumn: ColumnDef<SeatBatch>[] = [
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue('seatsRedeemed')}</div>
     ),
+  },
+  {
+    accessorKey: 'status',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Status
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <GenerationStatusBadge status={row.getValue('status') as EGenerationStatus} />
+    ),
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue || filterValue === 'all') return true;
+      return row.getValue(columnId) === filterValue;
+    },
   },
   {
     id: 'actions',

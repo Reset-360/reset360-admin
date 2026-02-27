@@ -53,6 +53,7 @@ const typesOptions = [
   { id: 'ADAPTS-P', value: 'ADAPTS-P' },
   { id: 'ADAPTS-T', value: 'ADAPTS-T' },
   { id: 'ADAPTS-C', value: 'ADAPTS-C' },
+  { id: 'UNSET', value: 'NOT SET' },
 ];
 
 const statusOptions = [
@@ -120,9 +121,16 @@ export default function SeatCodePage() {
       };
       if (filterOrg !== 'all') params.organizationId = filterOrg;
       if (filterCohort !== 'all') params.cohortId = filterCohort;
-      if (filterType !== 'all') params.type = filterType;
       if (filterStatus !== 'all') params.status = filterStatus;
       if (debouncedSearch) params.search = debouncedSearch;
+
+      if (filterType !== 'all') {
+        if (filterType === 'UNSET') {
+          params.type = ''
+        } else {
+          params.type = filterType;
+        }
+      }
 
       const res = await api.get('/seat-codes', { params });
       setData(res.data.data);
