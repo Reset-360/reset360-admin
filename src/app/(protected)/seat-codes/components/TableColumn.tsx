@@ -70,7 +70,7 @@ const TableColumn: ColumnDef<SeatCode>[] = [
   },
   {
     id: 'cohortId',
-    accessorFn: (row) => row.cohortId?._id, // ✅ filter value
+    accessorFn: (row) => row.batchId?.cohortId?._id, // ✅ filter value // 3.12 Base on actual cohort value in future seatcode.cohortId
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -81,7 +81,7 @@ const TableColumn: ColumnDef<SeatCode>[] = [
       </Button>
     ),
     cell: ({ row }) => {
-      const cohort = row.original.cohortId;
+      const cohort = row.original.batchId?.cohortId;
       return <div className="capitalize">{cohort?.name ?? ''}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
