@@ -26,3 +26,4 @@
 
 - Make ADAPTS type on seat generation optional
 - Fix export if row.original is not defined on ExportDropdown
+- Make ADAPTS type on seat generation optional
