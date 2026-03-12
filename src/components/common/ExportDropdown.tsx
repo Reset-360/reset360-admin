@@ -45,7 +45,7 @@ export function ExportDropdown<T>({
             e.preventDefault();
 
             // extract original data from table
-            const exportData = data.map((row: any) => row.original);
+            const exportData = data.map((row: any) => row?.original ?? row);
             exportToExcel(exportData, columns, fileName);
           }}
         >
@@ -56,7 +56,7 @@ export function ExportDropdown<T>({
             e.preventDefault();
 
             // extract original data from table
-            const exportData = data.map((row: any) => row.original);
+            const exportData = data.map((row: any) => row?.original ?? row);
             exportToCSV(exportData, columns, fileName);
           }}
         >
@@ -66,7 +66,7 @@ export function ExportDropdown<T>({
           onSelect={(e) => {
             e.preventDefault();
             // extract original data from table
-            const exportData = data.map((row: any) => row.original);
+            const exportData = data.map((row: any) => row?.original ?? row);
             exportToPDF(exportData, columns, fileName, orientation);
           }}
         >

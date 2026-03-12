@@ -208,7 +208,7 @@ export default function SeatCodePage() {
     state: { sorting },
     meta: { viewItem: handleView },
   });
-
+console.log(data)
   return (
     <Main>
       <PageHeader
