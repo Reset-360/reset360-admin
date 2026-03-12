@@ -76,7 +76,7 @@ const exportColumns = [
   {
     header: 'Cohort',
     accessorKey: 'cohortId',
-    accessorFn: (r: any) => r.cohortId?.name,
+    accessorFn: (r: any) => r.batchId?.cohortId?.name,
   },
   { header: 'Code', accessorKey: 'code' },
   { header: 'Type', accessorKey: 'type' },
