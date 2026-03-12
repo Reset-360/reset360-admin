@@ -61,9 +61,19 @@ const GenerateSeatCodeDialog = ({
     const start = performance.now();
 
     try {
+      const params: GenerateSeatCodeValues = {
+        batchId: values.batchId,
+        cohortId: values.cohortId,
+        quantity: values.quantity,
+      }
+
+      if (values.type != 'UNSET') {
+        params.type = values.type;
+      }
+
       await api.post(
         `${process.env.NEXT_PUBLIC_API_URL}/seat-codes/generate`,
-        values
+        params
       );
 
       const end = performance.now(); // end timer
@@ -180,6 +190,7 @@ const GenerateSeatCodeDialog = ({
                   </SelectTrigger>
 
                   <SelectContent>
+                    <SelectItem value={'UNSET'}>UNSET</SelectItem>
                     {assessmentTypes.map((type) => (
                       <SelectItem key={type} value={type}>
                         {type}
@@ -221,6 +232,7 @@ const GenerateSeatCodeDialog = ({
                   variant="outline"
                   type="button"
                   onClick={() => onOpenChange(false)}
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </Button>

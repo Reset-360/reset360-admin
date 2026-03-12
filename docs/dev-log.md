@@ -14,6 +14,14 @@
 
 - Add features and description on Tier settings
 
-# ✅ Completed Tasks — 2026-02-16
+# ✅ Completed Tasks — 2026-02-26
 
 - Add server side pagination for seat codes
+
+# ✅ Completed Tasks — 2026-02-27
+
+- Add seat code generation status on batch
+
+# ✅ Completed Tasks — 2026-03-12
+
+- Make ADAPTS type on seat generation optional
