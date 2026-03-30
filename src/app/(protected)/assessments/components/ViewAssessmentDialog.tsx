@@ -72,6 +72,15 @@ const subscaleConfig = {
   },
 };
 
+type FactorResult = {
+  rawScore: number; // 0–3 scale sum
+  tScore: number; // Normed T-score
+  maxRawScore: number; // Maximum possible raw score for this subscale
+  percentOfMax: number; // rawScore / maxRawScore as 0–100 (for display)
+  isBorderlineClinical: boolean; // T >= 65
+  isClinical: boolean; // T >= 70
+};
+
 export default function ViewAssessmentDialog({
   assessment,
   open,
@@ -148,20 +157,24 @@ export default function ViewAssessmentDialog({
             <div className="grid grid-cols-3 gap-2 border-y py-5">
               <div className="p-2 border-1 rounded-md text-center bg-card">
                 <InfoItem
-                  label="Total Rating"
-                  value={assessment.totalRating}
+                  label="Effective tScore"
+                  value={assessment.effectiveTScore}
                   center
                 />
               </div>
 
               <div className="p-2 border-1 rounded-md text-center bg-card">
-                <InfoItem label="tScore" value={assessment.tScore} center />
+                <InfoItem
+                  label="tScore"
+                  value={assessment.totalTScore}
+                  center
+                />
               </div>
 
               <div className="p-2 border-1 rounded-md text-center bg-card">
                 <InfoItem
                   label="tScore Category"
-                  value={assessment.tScoreSummary?.tScoreCategory}
+                  value={assessment.tScoreCategory}
                   center
                 />
               </div>
@@ -175,31 +188,67 @@ export default function ViewAssessmentDialog({
                 </h3>
               </div>
               <div className="grid grid-cols-3 gap-3">
-                {(
-                  Object.entries(assessment.subScales as any) as [
+                {Object.entries(
+                  assessment.subScales as Record<
                     keyof typeof subscaleConfig,
-                    number
-                  ][]
-                ).map(([key, value], index) => {
-                  const config = subscaleConfig[key];
+                    FactorResult
+                  >
+                ).map(([key, factor], index) => {
+                  const config =
+                    subscaleConfig[key as keyof typeof subscaleConfig];
                   const Icon = config.icon;
+
                   return (
                     <div
                       key={key}
                       className={`p-4 rounded-xl border ${config.colorClass} animate-slide-up transition-all hover:scale-[1.02]`}
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      <div className="flex items-center gap-2 mb-2">
-                        <Icon className="w-4 h-4" />
-                        <span className="text-xs font-bold uppercase tracking-wide">
-                          {key}
-                        </span>
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Icon className="w-4 h-4" />
+                          <span className="text-xs font-bold uppercase tracking-wide">
+                            {key}
+                          </span>
+                        </div>
+                        {factor.isClinical && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-500">
+                            Clinical
+                          </span>
+                        )}
+                        {!factor.isClinical && factor.isBorderlineClinical && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-600">
+                            Borderline
+                          </span>
+                        )}
                       </div>
+
+                      {/* T-score — primary value */}
                       <div className="text-2xl font-display font-bold">
-                        {value}
+                        T‑{factor.tScore}
                       </div>
-                      <div className="text-xs opacity-70 mt-0.5">
+
+                      {/* Full name */}
+                      <div className="text-xs opacity-70 mt-0.5 mb-2">
                         {config.fullName}
+                      </div>
+
+                      {/* Raw score progress bar */}
+                      <div className="mt-1">
+                        <div className="flex justify-between text-[10px] opacity-60 mb-1">
+                          <span>
+                            Raw: {factor.rawScore}/{factor.maxRawScore}
+                          </span>
+                          <span>{factor.percentOfMax}%</span>
+                        </div>
+                        {/* Track — use bg-current/20 so opacity is on the color, not the element */}
+                        <div className="h-1.5 rounded-full bg-current/20 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-current/80 transition-all duration-500"
+                            style={{ width: `${factor.percentOfMax}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
                   );

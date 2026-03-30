@@ -24,22 +24,30 @@ export enum ERiskLevel {
 export type Assessment = {
   _id: string;
   ref?: string;
-  userId: any;
-  organizationId?: any;
-  cohortId?: any;
+  userId: string;
+  entitlementId?: string;
+  organizationId?: string;
+  cohortId?: string;
   type: EAssessmentType;
-  subScales?: Record<string, any>,
-  totalSubScaleScores?: Record<string, any>;
-  tScore: number,
-  tScoreSummary?: Record<string, any>;
-  totalRating: number;
+  subScales?: Record<string, any>;
+  totalSubScalesScore?: Record<string, any>;
+  elevatedSubscales?: string[];
+  effectiveTScore?: number;
+  totalRawScore?: number;
+  totalTScore?: number;
+  tScoreCategory?: string;
+  riskBand?: ERiskBand;
+  riskLevel?: ERiskLevel;
+  normNote?: string | null;
+  isNormValidated?: boolean;
+  hasSelfHarmFlag?: boolean;
   answers?: Record<string, any>;
-  riskBand?: ERiskBand,
-  riskLevel?: ERiskLevel,
+  answersDraft?: Record<string, any>;
+  currentQuestionIndex: number;
+  timeSpentSec: number;
   startedAt?: Date;
   submittedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  
   clientProfile?: ClientProfile
   seatCode?: SeatCode
   organization: Organization
