@@ -27,3 +27,7 @@
 - Make ADAPTS type on seat generation optional
 - Fix export if row.original is not defined on ExportDropdown
 - Make ADAPTS type on seat generation optional
+
+# ✅ Completed Tasks — 2026-03-30
+
+- Update ViewAssessmentDialog with updated adapts scoring

@@ -14,7 +14,7 @@ const segmentConfig = {
     label: 'Parent',
     className: 'bg-blue-500 text-white dark:bg-blue-600',
   },
-  [EClientSegment.INDIVIDUAL]: {
+  [EClientSegment.YOUNG_ADULT]: {
     label: 'Young Adult',
     className: 'bg-yellow-500 text-black dark:bg-yellow-400',
   },

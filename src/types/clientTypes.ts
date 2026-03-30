@@ -7,7 +7,7 @@ export enum EClientSegment {
   STUDENT = 'STUDENT',
   TEACHER = 'TEACHER',
   PARENT = 'PARENT',
-  INDIVIDUAL = 'INDIVIDUAL',
+  YOUNG_ADULT = 'YOUNG_ADULT',
 }
 
 export enum EGender {
